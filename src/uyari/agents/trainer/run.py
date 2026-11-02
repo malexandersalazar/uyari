@@ -181,6 +181,116 @@ def _rescore_on(paths: Paths, ref: str, tag: str, rdir: Path) -> dict:
     return res
 
 
+def _scores(model_dir: Path) -> dict:
+    f = model_dir / "scores.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}
+
+
+def _floor(paths: Paths, model_dir: Path, build: str, language: str, dirs: list[str], split: str) -> dict:
+    """Retrieval floor on the model's build and directions: the stored one if complete, else scored now
+    (TF-IDF over the train pairs; seconds, no GPU)."""
+    from uyari.pipelines.mt.eval import run_eval
+
+    f = paths.runs / "retrieval" / build / language / "scores.json"
+    have = (json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}).get(split) or {}
+    if all(d in have for d in dirs) and have.get("limit") is None:
+        return have
+    return run_eval(paths, "retrieval", split, recipe=model_dir / "recipe.yaml")[split]
+
+
+def register_model(paths: Paths, ref: str, slot: str | None = None, score_test: bool = True,
+                   force: bool = False, reason: str = "") -> dict:
+    """The Trainer's promotion rule for a model trained outside the loop (``make train-nllb``,
+    ``make train-glimmer``): same checks, same records, no build and no PR.
+
+    1. Validation from the model's ``scores.json`` (scored now if missing), the retrieval floor on the same
+       build and directions, and the slot's incumbent on the same build (stored scores, or re-scored).
+    2. Registered only if every direction beats the floor and :func:`promotion_margin_ok` holds, or with
+       ``force`` and a reason (written to the registry history). Then: test once, registry, model card,
+       and the incumbent's card is rewritten so it no longer says it is served.
+
+    Slot by default: ``promoted`` (the demo default) for QLoRA models, ``fast`` for seq2seq (NLLB).
+    """
+    from uyari.pipelines.mt.card import write_card
+    from uyari.pipelines.mt.common import read_meta
+    from uyari.pipelines.mt.eval import run_eval
+    from uyari.registry import promoted, set_slot
+    from uyari.serve import gpu_session
+
+    name = Path(ref).name
+    d = paths.models / name
+    meta = read_meta(d)
+    lang, build = meta["language"], meta["build"]
+    slot = slot or _slot(meta["method"])
+    if slot not in ("promoted", "fast"):
+        raise ValueError(f"slot must be 'promoted' or 'fast', not {slot!r}")
+    if force and not reason.strip():
+        raise ValueError("--force needs a --reason; it is written to models/registry.yaml")
+
+    stored = _scores(d)
+    cand = stored.get("validation")
+    if not cand:
+        with gpu_session(paths, f"register: validation {name}"):
+            cand = run_eval(paths, ref, "validation")["validation"]
+    dirs = [k for k in cand if ">" in k]
+    floor = _floor(paths, d, build, lang, dirs, "validation")
+    inc_ref = promoted(paths, "mt", lang, slot)
+    out = {"model": name, "slot": slot, "build": build,
+           "candidate": {k: cand[k]["chrf++"] for k in dirs} | {"mean": round(_mean(cand, dirs), 2)},
+           "floor": {k: floor[k]["chrf++"] for k in dirs} | {"mean": round(_mean(floor, dirs), 2)},
+           "incumbent": inc_ref}
+    if inc_ref == name:
+        return {**out, "decision": "already registered", "why": f"{name} already holds the {slot} slot"}
+
+    inc = None
+    if inc_ref and (paths.models / inc_ref).is_dir():
+        inc_stored = _scores(paths.models / inc_ref).get("validation")
+        if read_meta(paths.models / inc_ref).get("build") == build and inc_stored:
+            inc = inc_stored
+        else:
+            rdir = paths.runs / "register" / name
+            rdir.mkdir(parents=True, exist_ok=True)
+            with gpu_session(paths, f"register: re-score {inc_ref}"):
+                inc = _rescore_on(paths, inc_ref, build, rdir)
+    shared = [k for k in dirs if inc and k in inc]
+    beats_floor = all((cand[k]["chrf++"] or 0) > (floor[k]["chrf++"] or 0) for k in dirs)
+    margin_ok = promotion_margin_ok(cand, inc)
+    out.update({"incumbent_shared": {k: inc[k]["chrf++"] for k in shared} if inc else None,
+                "beats_floor": beats_floor, "margin_ok": margin_ok})
+
+    if not (beats_floor and margin_ok):
+        why = []
+        if not beats_floor:
+            why.append("below the retrieval floor in " + ", ".join(
+                k for k in dirs if (cand[k]["chrf++"] or 0) <= (floor[k]["chrf++"] or 0)))
+        if not margin_ok:
+            why.append(f"does not beat {inc_ref} on {', '.join(shared)} "
+                       f"({_mean(cand, shared):.2f} vs {_mean(inc, shared):.2f}; rule: +{PROMOTE_MARGIN}, or adds "
+                       f"directions and loses <= {PROMOTE_MARGIN})")
+        if not force:
+            return {**out, "decision": "not registered", "why": "; ".join(why)}
+        out["overridden"] = "; ".join(why)
+
+    if score_test:
+        test = stored.get("test")
+        if not test:
+            with gpu_session(paths, f"register: test {name}"):
+                test = run_eval(paths, ref, "test")["test"]
+        _floor(paths, d, build, lang, dirs, "test")
+        out["test"] = {k: test[k]["chrf++"] for k in dirs if k in test}
+
+    numbers = (f"validation mean chrF++ {out['candidate']['mean']} vs floor {out['floor']['mean']}"
+               + (f" and {inc_ref} {_mean(inc, shared):.2f} on {', '.join(shared)}" if inc and shared else "")
+               + f" on {build}")
+    set_slot(paths, "mt", lang, slot, name,
+             reason=(f"forced: {reason.strip()} ({numbers})" if out.get("overridden")
+                     else f"{reason.strip()}: {numbers}" if reason.strip() else numbers))
+    write_card(paths, d)
+    if inc_ref and (paths.models / inc_ref / "MODEL_CARD.md").is_file():
+        write_card(paths, paths.models / inc_ref)
+    return {**out, "decision": "registered", "why": numbers}
+
+
 def _open_pr(paths: Paths, language: str, tag: str, log: dict) -> str:
     branch = f"trainer/{tag}"
     files = [f"builds/{tag}/MANIFEST.json", f"languages/{language}/NEEDS.md", "models/registry.yaml"]

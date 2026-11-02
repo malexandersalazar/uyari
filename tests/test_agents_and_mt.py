@@ -122,3 +122,53 @@ def test_promotion_compares_shared_directions_and_allows_added_ones():
     assert promotion_margin_ok(sc(spa_cbt=37.8, cbt_spa=37.6, eng_cbt=30.0, cbt_eng=29.0), inc), "adds English"
     assert not promotion_margin_ok(sc(spa_cbt=36.0, cbt_spa=36.0, eng_cbt=30.0, cbt_eng=29.0), inc), "regresses"
     assert promotion_margin_ok(sc(spa_cbt=10.0), None)
+
+
+def _fake_model(fixture_root, tmp_path, name, val, test=None):
+    d = fixture_root.models / name
+    d.mkdir(parents=True)
+    (d / "recipe.yaml").write_text(_recipe(fixture_root, tmp_path).read_text(encoding="utf-8"), encoding="utf-8")
+    (d / "uyari_meta.json").write_text(json.dumps({
+        "name": name, "kind": "nllb", "method": "seq2seq", "language": "qaa_Latn", "build": "data-2026.10",
+        "primary": "spa_Latn", "directions": ["spa_Latn>qaa_Latn", "qaa_Latn>spa_Latn"]}), encoding="utf-8")
+    sc = {"validation": {k: {"chrf++": v} for k, v in val.items()} | {"mean_chrf++": sum(val.values()) / 2}}
+    if test:
+        sc["test"] = {k: {"chrf++": v} for k, v in test.items()}
+    (d / "scores.json").write_text(json.dumps(sc), encoding="utf-8")
+    return f"models/{name}"
+
+
+def test_register_applies_the_trainer_rule(fixture_root, tmp_path, monkeypatch):
+    import uyari.pipelines.mt.card as card
+    from uyari.agents.trainer.run import register_model
+    from uyari.registry import load, promoted
+
+    cards = []
+
+    def fake_card(paths, d, demo_note=""):
+        cards.append(d.name)
+        (d / "MODEL_CARD.md").write_text("card", encoding="utf-8")
+
+    monkeypatch.setattr(card, "write_card", fake_card)
+    run_build(fixture_root, "data-2026.10", as_of=date(2026, 11, 2))
+    t = {"spa>qaa": 90.0, "qaa>spa": 90.0}
+
+    low = _fake_model(fixture_root, tmp_path, "mt-qaa-spa-low@v0.1", {"spa>qaa": 0.1, "qaa>spa": 0.1}, t)
+    r = register_model(fixture_root, low)
+    assert r["decision"] == "not registered" and "floor" in r["why"] and not promoted(fixture_root, "mt", "qaa_Latn", "fast")
+
+    a = _fake_model(fixture_root, tmp_path, "mt-qaa-spa-a@v0.1", {"spa>qaa": 90.0, "qaa>spa": 90.0}, t)
+    r = register_model(fixture_root, a)
+    assert r["decision"] == "registered" and r["slot"] == "fast" and r["test"] == t
+    assert promoted(fixture_root, "mt", "qaa_Latn", "fast") == "mt-qaa-spa-a@v0.1" and cards == ["mt-qaa-spa-a@v0.1"]
+    assert register_model(fixture_root, a)["decision"] == "already registered"
+
+    b = _fake_model(fixture_root, tmp_path, "mt-qaa-spa-b@v0.1", {"spa>qaa": 90.2, "qaa>spa": 90.2}, t)
+    r = register_model(fixture_root, b)
+    assert r["decision"] == "not registered" and "does not beat mt-qaa-spa-a@v0.1" in r["why"]
+    with pytest.raises(ValueError):
+        register_model(fixture_root, b, force=True)
+    r = register_model(fixture_root, b, force=True, reason="demo needs it")
+    assert r["decision"] == "registered" and cards[-2:] == ["mt-qaa-spa-b@v0.1", "mt-qaa-spa-a@v0.1"]
+    last = load(fixture_root)["mt"]["qaa_Latn"]["history"][-1]
+    assert last["to"] == "mt-qaa-spa-b@v0.1" and last["reason"].startswith("forced: demo needs it")

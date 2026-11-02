@@ -1,4 +1,4 @@
-# Which model each task/language serves. Written by the Trainer (promotions) and by hand (the demo default). Never edit history.
+# Which model each task/language serves. Written by the Trainer and by `uyari register`, both with the promotion rule. Never edit history.
 mt:
   cbt_Latn:
     fast: mt-cbt-spa-nllb1.3b@v0.1

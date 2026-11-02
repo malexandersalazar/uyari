@@ -75,7 +75,10 @@ def run_eval(paths: Paths, ref: str, split: str = "validation", recipe: Path | s
         res, hyps = score_translator(tr, rows, rc.directions(), rc.language, limit)
         d = paths.runs / "retrieval" / rc.build / rc.language
         prev = json.loads((d / "scores.json").read_text(encoding="utf-8")) if (d / "scores.json").is_file() else {}
-        prev[split] = {**res, "scored_at": stamp, "limit": limit}
+        old = prev.get(split) or {}
+        # keep directions scored earlier by a recipe with other sources (e.g. Spanish only), same limit only
+        kept = {k: v for k, v in old.items() if ">" in k} if old.get("limit") == limit else {}
+        prev[split] = {**kept, **res, "scored_at": stamp, "limit": limit}
         write_json(d / "scores.json", prev)
         _write_hyps(d, split, hyps)
         return {"model": "retrieval", "build": rc.build, split: res}

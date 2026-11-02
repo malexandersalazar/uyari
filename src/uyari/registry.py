@@ -37,4 +37,4 @@ def set_slot(paths: Paths, task: str, lang: str, slot: str, name: str, reason: s
         "at": datetime.now(UTC).isoformat(timespec="seconds"), "slot": slot, "from": prev, "to": name,
         "reason": reason})
     write_yaml(_path(paths), reg, header="Which model each task/language serves. Written by the Trainer "
-                                         "(promotions) and by hand (the demo default). Never edit history.")
+                                         "and by `uyari register`, both with the promotion rule. Never edit history.")

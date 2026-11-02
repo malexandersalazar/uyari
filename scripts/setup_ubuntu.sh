@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Uyari setup for the Ubuntu RTX 4090 box.
 #
-#   bash scripts/setup_ubuntu.sh check     # before cloning: a throwaway venv to run check_4090.py
+#   bash scripts/setup_ubuntu.sh check     # in the clone, first: a throwaway venv to run check_4090.py
 #   bash scripts/setup_ubuntu.sh project   # inside the cloned repo: project venv + GPU extras
 #
 # Requires: NVIDIA driver already installed (nvidia-smi works). CUDA toolkit is NOT
@@ -49,8 +49,8 @@ case "$MODE" in
     echo
     echo "Next:"
     echo "  uv run --no-sync pytest -q"
-    echo "  uv run --no-sync uyari build --tag data-2026.11"
-    echo "  uv run --no-sync uyari train --recipe recipes/cbt-spa.mt.glimmer-qlora.yaml"
+    echo "  uv run --no-sync uyari build --tag data-2026.11 --as-of 2026-11-02 --verify"
+    echo "  make all                         # train, register, NEEDS.md, report (docs/RUNBOOK-4090.md)"
     ;;
   *)
     echo "usage: $0 [check|project]" >&2

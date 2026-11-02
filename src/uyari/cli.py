@@ -285,6 +285,29 @@ def trainer(language: str = typer.Option("cbt_Latn"),
 
 
 @app.command()
+def register(model: str = typer.Option(..., help="models/<name>@vX.Y"),
+             slot: str = typer.Option(None, help="promoted (the demo default) or fast (fast mode, HF Space). "
+                                               "Default: promoted for Glimmer (QLoRA), fast for NLLB."),
+             test: bool = typer.Option(True, "--test/--no-test", help="Score test once when registered."),
+             force: bool = typer.Option(False, help="Register even if the rule says no. Needs --reason."),
+             reason: str = typer.Option("", help="Written to models/registry.yaml with the numbers."),
+             root: Path = ROOT_OPT):
+    """The Trainer's promotion rule for a model trained by hand: beats the floor in every direction and the
+    slot's incumbent; then test once, models/registry.yaml and the model card. Exit code 3 if not registered."""
+    from uyari.agents.trainer.run import register_model
+
+    try:
+        res = register_model(_paths(root), model, slot=slot, score_test=test, force=force, reason=reason)
+    except ValueError as e:
+        _fail(str(e))
+    console.print_json(json.dumps(res, ensure_ascii=False, default=str))
+    color = {"registered": "green", "already registered": "green"}.get(res["decision"], "yellow")
+    console.print(f"[{color}]{res['decision']}[/{color}] {res['model']} ({res['slot']}): {res['why']}")
+    if res["decision"] == "not registered":
+        raise typer.Exit(3)
+
+
+@app.command()
 def needs(language: str = typer.Option("cbt_Latn"), tag: str = typer.Option(None), root: Path = ROOT_OPT):
     """Write languages/<lang>/NEEDS.md from the latest build manifest."""
     from uyari.agents.trainer.needs import write_needs
