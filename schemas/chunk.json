@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/chunk.json",
+  "title": "Primary chunk (one row of primary/<lang>/chunks/**/*.csv)",
+  "x-columns": ["chunk_id", "text", "split", "origin", "status", "supersedes",
+    "domain_l1", "domain_l2", "register", "acto_comunicativo", "tiempo_aspecto", "polaridad",
+    "persona_deixis", "length_bucket", "word_count", "perfil_hablante", "tono_emocional",
+    "discurso_conectado", "palabras_ancla", "source_custom_id", "source_batch_id", "regen_of",
+    "gen_model", "provider", "gen_date", "prompt_version"],
+  "type": "object",
+  "required": ["chunk_id", "text", "split", "origin", "status"],
+  "properties": {
+    "chunk_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "text": {"type": "string", "minLength": 1},
+    "split": {"enum": ["train", "validation", "test", ""]},
+    "origin": {"enum": ["imported", "synthetic", "human", "machine_translated"]},
+    "status": {"enum": ["active", "deprecated"]},
+    "supersedes": {"type": "string", "pattern": "^([0-9a-f]{32})?$"},
+    "word_count": {"type": "string", "pattern": "^[0-9]*$"},
+    "discurso_conectado": {"enum": ["true", "false", ""]},
+    "source_custom_id": {"type": "string"},
+    "regen_of": {"type": "string"},
+    "gen_model": {"type": "string"},
+    "provider": {"type": "string"},
+    "prompt_version": {"type": "string"}
+  }
+}

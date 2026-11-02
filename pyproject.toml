@@ -1,0 +1,82 @@
+[project]
+name = "uyari"
+version = "0.1.0"
+description = "Open data structure and training toolkit for Indigenous <-> official language translation (text and speech)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alexander Salazar" }]
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pyarrow>=17",
+  "pyyaml>=6.0",
+  "jsonschema>=4.21",
+  "typer>=0.12",
+  "rich>=13",
+  "openpyxl>=3.1",
+  "python-dotenv>=1.0",
+  "httpx>=0.27",
+  "tiktoken>=0.7",
+  "sacrebleu>=2.4",
+  "scikit-learn>=1.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/malexandersalazar/uyari"
+Repository = "https://github.com/malexandersalazar/uyari"
+
+[project.optional-dependencies]
+ml = [
+  "torch>=2.5",
+  "transformers>=4.46",
+  "datasets>=3.0",
+  "accelerate>=1.0",
+  "sentencepiece>=0.2",
+  "protobuf>=4",
+  "peft>=0.13",
+  "trl>=0.12",
+  "bitsandbytes>=0.45",
+  "sentence-transformers>=3.0",
+]
+speech = ["soundfile>=0.12", "jiwer>=3.0"]
+demo = ["gradio>=5.0"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+uyari = "uyari.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/uyari"]
+
+[tool.uv]
+# Windows needs the CUDA wheel index; Linux gets CUDA wheels from PyPI.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "PTH", "PLW1514"]
+ignore = ["E501", "B008"]
+preview = true
+explicit-preview-rules = true   # enables PLW1514 (open() without encoding) only
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/check_4090.py" = ["PTH"]

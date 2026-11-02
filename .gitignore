@@ -1,0 +1,34 @@
+# Private inputs (ingest configs, name lists for the privacy check) and secrets. NEVER commit.
+.private/
+.env
+
+# Local state and outputs
+.uyari/
+runs/
+builds/**/*.parquet
+models/**/weights/
+models/**/checkpoints/
+models/**/adapter/
+*.gguf
+check_4090_report.json
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Smoke-test models and generated fixtures
+models/*smoke*/
+tests/fixtures/root/
+reports/blind/
+reports/spot/

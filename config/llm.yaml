@@ -1,0 +1,74 @@
+# Uyari LLM catalog, prices and budget. Read by src/uyari/llm/*.
+#
+# data_policy decides what a model may see:
+#   official_only : official-language text only (Spanish, English...). Never Shawi or any
+#                   community contribution. The Muse Spark *Contributor* tier is priced low
+#                   because Meta may train on prompts and completions.
+#   any           : may see community data (local models on our own hardware).
+#   none          : never called (price reference only).
+# Every call declares a data_class (official | community); llm/policy.py refuses a
+# community payload to an official_only model.
+
+budget:
+  total_usd: 150.00            # whole project, tracked in .uyari/ledger.jsonl
+  per_run_max_usd:             # hard cap per command run unless --max-usd overrides (lower or higher)
+    generate: 1.00
+    translate: 1.00            # uyari primary translate (Spanish -> English primary)
+    transcribe: 2.00
+    default: 0.00              # everything else runs locally
+
+estimate:
+  tokenizer: o200k_base        # tiktoken approximation; Muse tokenizer is not public
+  input_safety_factor: 1.20
+  output_tokens_per_word: 2.0  # Spanish with o200k is ~1.5-1.9 tokens/word; rounded up
+  json_overhead_tokens_per_text: 8
+  reasoning_allowance_tokens: 256   # per request, billed as output if the model reasons
+  low_high_band: [0.7, 1.5]         # multipliers on the expected figure
+
+defaults:
+  official: muse-spark-1.3-contributor   # Spanish generation, official-to-official
+  community: glimmer-local               # anything that touches Shawi: every agent
+
+models:
+  muse-spark-1.3-contributor:
+    provider: meta
+    api: responses
+    url_env: META_API_URL                # https://api.meta.ai/v1/responses
+    key_env: META_API_KEY
+    model_id: muse-spark-1.3-contributor
+    price_per_mtok: {input: 0.10, cached_input: 0.002, output: 0.20}
+    data_policy: official_only
+    request_defaults:
+      reasoning: {effort: minimal}       # lowest effort; confirmed by `uyari llm ping`
+    notes: >-
+      Contributor tier: discounted in exchange for Meta's right to train on prompts and
+      completions. Acceptable for synthetic Spanish; never sent Shawi.
+
+  glimmer-local:
+    provider: local
+    api: chat                            # OpenAI-compatible /v1/chat/completions (vLLM or llama-server)
+    url_env: GLIMMER_LOCAL_URL
+    default_url: http://127.0.0.1:8011/v1/chat/completions
+    model_id_env: GLIMMER_MODEL_ID
+    model_id: meta-models/Muse-Glimmer-30B
+    price_per_mtok: {input: 0.0, cached_input: 0.0, output: 0.0}
+    data_policy: any
+    request_defaults:
+      chat_template_kwargs: {reasoning_strength: medium}   # Glimmer ATEM template; default would be high
+
+  muse-voice-transcribe:
+    provider: meta
+    api: transcribe
+    url_env: META_TRANSCRIBE_URL
+    default_url: https://api.meta.ai/v1/asr/transcribe   # one-shot file endpoint (Meta model cookbook, 06_muse_voice)
+    key_env: META_API_KEY
+    model_id: muse-voice-transcribe-1.0
+    price_per_audio_hour: 0.18
+    data_policy: official_only           # Spanish speech in the demo only
+
+  claude-opus-4-8:
+    provider: anthropic
+    api: none                            # never called: list price for the generation comparison
+    price_per_mtok: {input: 5.00, cached_input: 0.50, output: 25.00}
+    batch_discount: 0.50                 # the 10k were generated through Message Batches
+    data_policy: none

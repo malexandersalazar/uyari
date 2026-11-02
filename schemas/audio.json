@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/audio.json",
+  "title": "Audio row (languages/<lang>/contributions/<id>/audio.csv)",
+  "x-columns": ["file", "chunk_id", "transcript", "speaker_id", "style", "device", "notes"],
+  "type": "object",
+  "required": ["file", "speaker_id", "style"],
+  "properties": {
+    "file": {"type": "string", "pattern": "^wav/[A-Za-z0-9._-]+\\.wav$"},
+    "chunk_id": {"type": "string", "pattern": "^([0-9a-f]{32})?$"},
+    "transcript": {"type": "string"},
+    "speaker_id": {"type": "string", "pattern": "^s-[0-9]{4}$"},
+    "style": {"enum": ["read", "spontaneous"]},
+    "device": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}

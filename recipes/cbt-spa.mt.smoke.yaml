@@ -1,0 +1,30 @@
+# Smoke test: NLLB 600M, 30 steps. Proves prepare -> train -> eval end to end on any GPU.
+id: cbt-spa.mt.smoke
+build: data-2026.11
+task: mt
+language: cbt_Latn
+primary: spa_Latn
+directions: [spa>cbt, cbt>spa]
+splits: {train: train, validation: validation}
+filters: {provenance: [human]}
+base_model: facebook/nllb-200-distilled-600M
+method: seq2seq
+new_lang_token_init: quy_Latn
+text_codec: {"ʼ": "'"}
+train:
+  epochs: 1
+  max_steps: 30
+  lr: 1.0e-4
+  optimizer: adafactor
+  precision: bf16_mixed
+  batch_size: 8
+  grad_accum: 1
+  max_len: 128
+  warmup_ratio: 0.1
+  seed: 7
+eval:
+  num_beams: 1
+  max_new_tokens: 64
+  batch_size: 32
+  limit: 40
+output: models/mt-cbt-spa-smoke@v0.0

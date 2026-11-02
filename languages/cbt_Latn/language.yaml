@@ -1,0 +1,17 @@
+# Shawi (Chayahuita). Read by validate, build, the pipelines and the agents.
+id: cbt_Latn
+iso639_3: cbt
+script: Latn
+glottocode: chay1248
+display_name: Shawi
+iso_name: Chayahuita
+primary: spa_Latn
+steward: malexandersalazar   # interim, until a Shawi-speaking steward is named (contributing/en/governance.md)
+community_authority: "to be agreed with Shawi community organizations"  # consulted on consent; may request a withdrawal
+apostrophe: "ʼ"          # U+02BC: the glottal stop is a letter (ipiʼ)
+apostrophe_variants: ["'", "’", "‘", "´", "`", "ʻ", "ʹ", "′"]
+training_orthography: _unspecified   # the translators' spelling; to be named by the steward
+trainer:
+  # Recipes the Trainer runs on every qualifying merge (the filmed loop). Glimmer runs manually.
+  recipes: [recipes/cbt.mt.nllb-1.3b.yaml]   # Shawi <-> Spanish and English, one model
+  min_growth: 0.10       # cut a new build only for >=10% more rows (or a new language)

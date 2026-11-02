@@ -1,0 +1,29 @@
+# Same model on the 12 GB RTX 3060: pure bf16 weights, batch 8, max length 128.
+id: cbt-spa.mt.nllb-1.3b-3060
+build: data-2026.11
+task: mt
+language: cbt_Latn
+primary: spa_Latn
+directions: [spa>cbt, cbt>spa]
+splits: {train: train, validation: validation}
+filters: {provenance: [human]}
+base_model: facebook/nllb-200-distilled-1.3B
+method: seq2seq
+new_lang_token_init: quy_Latn
+text_codec: {"ʼ": "'"}
+train:
+  epochs: 8
+  lr: 1.0e-4
+  optimizer: adafactor
+  precision: bf16_pure
+  batch_size: 8
+  grad_accum: 2
+  max_len: 128
+  warmup_ratio: 0.05
+  seed: 7
+  gradient_checkpointing: true
+eval:
+  num_beams: 4
+  max_new_tokens: 160
+  batch_size: 16
+output: models/mt-cbt-spa-nllb1.3b@v0.1

@@ -1,0 +1,32 @@
+{
+  "added_tokens": [
+    "cbt_Latn"
+  ],
+  "base_model": "facebook/nllb-200-distilled-1.3B",
+  "best_epoch": 6,
+  "build": "data-2026.11",
+  "codec": {
+    "ʼ": "'"
+  },
+  "directions": [
+    "spa_Latn>cbt_Latn",
+    "cbt_Latn>spa_Latn"
+  ],
+  "eval": {
+    "batch_size": 16,
+    "max_new_tokens": 160,
+    "num_beams": 4
+  },
+  "kind": "nllb",
+  "language": "cbt_Latn",
+  "method": "seq2seq",
+  "name": "mt-cbt-spa-nllb1.3b@v0.1",
+  "primary": "spa_Latn",
+  "recipe_file": "cbt-spa.mt.nllb-1.3b-3060.yaml",
+  "recipe_id": "cbt-spa.mt.nllb-1.3b-3060",
+  "selection_chrf_greedy": 37.6,
+  "selection_examples": 200,
+  "steps": 2562,
+  "trained_at": "2026-11-02T10:13:42+00:00",
+  "weights": "weights"
+}

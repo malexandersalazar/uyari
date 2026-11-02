@@ -1,0 +1,23 @@
+# The Spanish primary corpus: what every language translates.
+id: spa_Latn
+display_name: Español
+batches:
+  - id: 2026-06_opus48_0001
+    file: chunks/generated/2026-06_opus48_0001.csv
+    origin: synthetic
+    gen_model: claude-opus-4-8
+    provider: anthropic (Message Batches)
+    notes: >-
+      First batch (June 2026): 10,000 chunks covering 4 of the matrix's 15 domains. Generation has since
+      moved to Meta models (Muse Spark 1.3 Contributor, Muse Glimmer).
+  - id: 2026-11_musespark13c_0001
+    file: chunks/generated/2026-11_musespark13c_0001.csv
+    origin: synthetic
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      Regenerates 200 matrix cells of 2026-06_opus48_0001 with the identical prompt
+      (prompt_version pv-337a163d411a): 2,000 texts, 0 rejected, 23 near-duplicates removed,
+      1,977 published. Each group carries regen_of and inherits its source group's split.
+      Cost USD 0.0423 (ledger), 3.3% of the first batch's cost per 1,000 chunks.
+      Comparison: reports/gen-comparison.md.

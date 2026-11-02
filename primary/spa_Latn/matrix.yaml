@@ -1,0 +1,719 @@
+# Design matrix for Spanish primary-corpus generation (primary/spa_Latn).
+# The matrix of the June 2026 batch, unchanged (prompt_version pv-337a163d411a, pinned by
+# tests/test_gen_port.py). Read by src/uyari/gen/. Changing an axis changes prompt_version on
+# every new chunk and needs a docs/decisions record.
+version: 1
+source: design matrix of the June 2026 batch (do not edit without a decision record)
+texts_per_request: 10
+seed: 20260605
+n_palabras_ancla: 3
+domains:
+  vida_cotidiana:
+  - levantarse temprano
+  - barrer la casa
+  - ir a traer agua del río
+  - encender el fuego
+  - lavar la ropa en el río
+  - descansar en la hamaca
+  - conversar al atardecer
+  - tender la cama
+  - recibir una visita
+  - cuidar la casa mientras los demás salen
+  - guardar las herramientas
+  - esperar a que vuelva la familia
+  familia_parentesco:
+  - la madre cuida al bebé
+  - el abuelo cuenta historias a los nietos
+  - los hermanos juegan juntos
+  - la familia come reunida
+  - enseñar a los hijos a trabajar
+  - visitar a los parientes
+  - el nacimiento de un niño
+  - cuidar a los mayores
+  - una pareja se casa en la comunidad
+  - extrañar a un familiar que viajó
+  - la madre carga al hijo en la espalda
+  - el padre lleva al hijo a pescar
+  comida_cocina:
+  - pelar yuca
+  - preparar masato
+  - asar pescado al fuego
+  - recoger plátanos maduros
+  - cocinar en olla de barro
+  - repartir la comida
+  - hacer fariña de yuca
+  - preparar caldo de pescado
+  - guardar comida para mañana
+  - comer en familia
+  - moler el maíz
+  - cocinar para una fiesta
+  rio_monte_naturaleza:
+  - navegar en canoa por el río
+  - cruzar el río con cuidado
+  - caminar por el monte
+  - el río crece con la lluvia
+  - buscar leña seca
+  - el camino se vuelve lodoso
+  - bañarse en el río temprano
+  - pescar en la quebrada
+  - el sol se refleja en el agua
+  - escuchar los sonidos del monte
+  - seguir un sendero conocido
+  - regresar antes de que oscurezca
+  animales_plantas:
+  - el mono salta entre los árboles
+  - el pez nada en el río
+  - los pájaros cantan al amanecer
+  - sembrar una planta de plátano
+  - recoger frutos del árbol
+  - usar una planta para curar
+  - el perro acompaña a la casa
+  - cuidar las gallinas
+  - un árbol muy grande y antiguo
+  - encontrar huellas de un animal
+  - las hormigas cruzan el camino
+  - florece la planta sembrada
+  salud_cuerpo:
+  - el niño tiene fiebre
+  - dolor de cabeza fuerte
+  - curar con plantas del monte
+  - la partera ayuda en el parto
+  - una herida en el pie
+  - sentirse muy cansado
+  - descansar para sanar
+  - cuidar a un enfermo en casa
+  - el remedio que prepara el curandero
+  - tomar agua hervida
+  - sentir frío y temblar
+  - recuperarse poco a poco
+  clima_tiempo:
+  - empieza a llover fuerte
+  - sale el sol después de la lluvia
+  - hace frío en la madrugada
+  - viene una tormenta
+  - el día está nublado
+  - la noche es muy oscura
+  - el calor del mediodía
+  - esperar a que pase la lluvia
+  - el viento mueve los árboles
+  - amanece despejado
+  - la lluvia no deja salir
+  - el río baja cuando deja de llover
+  chacra_pesca_caza:
+  - sembrar en la chacra
+  - cosechar la yuca
+  - ir de pesca muy temprano
+  - preparar la red
+  - cazar en el monte
+  - limpiar el terreno para sembrar
+  - sembrar plátano
+  - recoger la cosecha
+  - repartir el pescado entre todos
+  - revisar las trampas
+  - cargar la cosecha de regreso
+  - guardar semillas para sembrar
+  vida_comunal:
+  - una reunión de toda la comunidad
+  - trabajar juntos en una faena
+  - una fiesta del pueblo
+  - ayudar al vecino a construir su casa
+  - resolver un problema entre todos
+  - el jefe habla a la gente
+  - compartir la comida entre todos
+  - limpiar el camino comunal
+  - recibir a visitantes de otra comunidad
+  - organizar una minga
+  - cuidar a los niños del pueblo
+  - tomar una decisión juntos
+  narrativa_tradicional:
+  - un cuento de los antiguos
+  - la historia del río
+  - una leyenda de animales
+  - lo que contaba el abuelo
+  - el origen de la comunidad
+  - contar un sueño
+  - una historia de caza de hace mucho tiempo
+  - cómo aprendieron a pescar los antiguos
+  - la historia de un animal astuto
+  - un relato sobre la luna y el sol
+  - lo que pasó una vez en el monte
+  - una enseñanza de los mayores
+  educacion_escuela:
+  - el niño va a la escuela
+  - aprender a leer
+  - el maestro enseña en clase
+  - escribir en el cuaderno
+  - contar números
+  - los niños estudian juntos
+  - la escuela de la comunidad
+  - aprender en dos lenguas
+  - el niño pregunta al maestro
+  - hacer la tarea en casa
+  - caminar a la escuela por la mañana
+  - una clase al aire libre
+  puente_civico:
+  - llevar al niño a vacunar
+  - sacar el documento de identidad
+  - una campaña de salud en el pueblo
+  - conocer los derechos de la comunidad
+  - la visita del personal de salud
+  - una reunión con las autoridades
+  - cuidar la salud de todos
+  - registrar el nacimiento de un niño
+  - pedir apoyo para la escuela
+  - informar a la gente sobre una enfermedad
+  - una jornada de vacunación
+  - explicar cómo cuidarse de una enfermedad
+  emociones_relaciones:
+  - estar contento por una buena noticia
+  - extrañar a alguien que se fue
+  - tener miedo en la noche
+  - estar preocupado por la familia
+  - sentir cariño por un hijo
+  - enojarse y luego perdonar
+  - despedirse de un amigo
+  - alegrarse al ver a un pariente
+  - sentirse solo cuando llueve
+  - agradecer la ayuda de un vecino
+  - esperar con esperanza
+  - consolar a alguien que está triste
+  comercio_intercambio:
+  - vender plátanos en el pueblo
+  - intercambiar pescado por sal
+  - comprar lo necesario en el pueblo
+  - llevar los productos al mercado
+  - acordar un precio justo
+  - prestar algo a un vecino
+  - cambiar un producto por otro
+  - guardar dinero para lo necesario
+  - regresar del pueblo con compras
+  - pedir fiado y pagar después
+  - ayudar a vender a un familiar
+  - repartir lo ganado en la familia
+  viaje_desplazamiento:
+  - viajar en canoa hasta el pueblo
+  - el camino es largo y cansado
+  - llegar a otra comunidad
+  - esperar la lancha en la orilla
+  - regresar a casa al anochecer
+  - perderse y volver a encontrar el camino
+  - cargar las cosas para el viaje
+  - descansar a mitad del camino
+  - cruzar varias quebradas
+  - avisar que se va de viaje
+  - encontrarse con alguien en el camino
+  - llegar cansado pero contento
+actos:
+- narracion
+- dialogo
+- instruccion
+- descripcion
+- pregunta_respuesta
+- consejo_advertencia
+- peticion
+- saludo_cortesia
+- acuerdo
+- expresion_emocional
+registros:
+- casual
+- neutral
+- formal
+- ceremonial
+- infantil
+tiempos:
+- pasado
+- presente
+- futuro
+- habitual
+- condicional
+polaridades:
+- afirmativo
+- negativo
+- interrogativo
+- imperativo
+- dubitativo
+personas:
+- 1a_singular
+- 1a_plural
+- 2a_directo
+- 3a
+- dialogo_dos_personas
+perfiles:
+- madre joven
+- padre de familia
+- abuelo
+- abuela
+- pescador
+- partera
+- maestro de la comunidad
+- curandero
+- comerciante
+- niño
+- joven de la comunidad
+- líder comunal
+tonos:
+- neutral
+- alegre
+- preocupado
+- nostálgico
+- apurado
+- cariñoso
+- serio
+anclas:
+  vida_cotidiana:
+  - candela
+  - hamaca
+  - escoba
+  - balde
+  - leña
+  - olla
+  - machete
+  - mosquitero
+  - patio
+  - estera
+  - madrugada
+  - vecina
+  - barrer
+  - remendar
+  - tender
+  - cargar
+  - descansar
+  - conversar
+  - amanecer
+  - oscurecer
+  - tranquilo
+  - tibio
+  - limpio
+  - cansado
+  - temprano
+  - despacio
+  familia_parentesco:
+  - abuela
+  - sobrino
+  - cuñado
+  - suegra
+  - bebé
+  - nieta
+  - comadre
+  - primo
+  - yerno
+  - crianza
+  - consejo
+  - abrazo
+  - abrazar
+  - criar
+  - acompañar
+  - aconsejar
+  - nacer
+  - crecer
+  - casarse
+  - visitar
+  - cariñoso
+  - unido
+  - respetuoso
+  - mayor
+  - pequeño
+  - querido
+  comida_cocina:
+  - yuca
+  - masato
+  - fariña
+  - plátano
+  - tinaja
+  - brasas
+  - caldo
+  - sal
+  - ají
+  - humo
+  - leña
+  - canasta
+  - pelar
+  - moler
+  - hervir
+  - asar
+  - repartir
+  - probar
+  - servir
+  - ahumar
+  - sabroso
+  - espeso
+  - maduro
+  - caliente
+  - dulce
+  - salado
+  rio_monte_naturaleza:
+  - canoa
+  - remo
+  - quebrada
+  - orilla
+  - palizada
+  - barranco
+  - trocha
+  - lodo
+  - creciente
+  - playa
+  - neblina
+  - sombra
+  - remar
+  - vadear
+  - nadar
+  - resbalar
+  - brillar
+  - crecer
+  - bajar
+  - escuchar
+  - hondo
+  - correntoso
+  - fresco
+  - espeso
+  - oscuro
+  - sereno
+  animales_plantas:
+  - mono
+  - majás
+  - paujil
+  - loro
+  - motelo
+  - hormiga
+  - avispa
+  - huella
+  - nido
+  - semilla
+  - raíz
+  - corteza
+  - fruto
+  - trepar
+  - volar
+  - cantar
+  - sembrar
+  - florecer
+  - picar
+  - ladrar
+  - anidar
+  - astuto
+  - manso
+  - silvestre
+  - espinoso
+  - frondoso
+  salud_cuerpo:
+  - fiebre
+  - herida
+  - dolor
+  - remedio
+  - hierba
+  - emplasto
+  - partera
+  - curandero
+  - escalofrío
+  - tos
+  - mareo
+  - hueso
+  - curar
+  - sanar
+  - descansar
+  - hervir
+  - frotar
+  - vendar
+  - toser
+  - sudar
+  - débil
+  - aliviado
+  - hinchado
+  - pálido
+  - fuerte
+  - enfermo
+  clima_tiempo:
+  - aguacero
+  - trueno
+  - relámpago
+  - neblina
+  - brisa
+  - charco
+  - barro
+  - arcoíris
+  - sequía
+  - nubarrón
+  - garúa
+  - ventarrón
+  - llover
+  - escampar
+  - tronar
+  - soplar
+  - mojar
+  - secar
+  - refrescar
+  - amanecer
+  - nublado
+  - despejado
+  - húmedo
+  - helado
+  - caluroso
+  chacra_pesca_caza:
+  - chacra
+  - machete
+  - anzuelo
+  - red
+  - trampa
+  - flecha
+  - carnada
+  - surco
+  - semilla
+  - cosecha
+  - canasta
+  - monte
+  - sembrar
+  - cosechar
+  - desyerbar
+  - pescar
+  - cazar
+  - rozar
+  - cargar
+  - repartir
+  - acechar
+  - tumbar
+  - maduro
+  - tupido
+  - fértil
+  - pesado
+  vida_comunal:
+  - minga
+  - faena
+  - asamblea
+  - apu
+  - vecino
+  - comunidad
+  - acuerdo
+  - fiesta
+  - tambor
+  - invitación
+  - patio
+  - techo
+  - ayudar
+  - reunirse
+  - acordar
+  - compartir
+  - organizar
+  - construir
+  - invitar
+  - celebrar
+  - escuchar
+  - opinar
+  - unido
+  - generoso
+  - trabajador
+  - justo
+  narrativa_tradicional:
+  - antiguos
+  - leyenda
+  - lucero
+  - luna
+  - espíritu
+  - otorongo
+  - sueño
+  - anciano
+  - fogón
+  - memoria
+  - noche
+  - selva
+  - contar
+  - soñar
+  - recordar
+  - enseñar
+  - transformarse
+  - aparecer
+  - desaparecer
+  - suceder
+  - antiguo
+  - misterioso
+  - sabio
+  - astuto
+  - lejano
+  educacion_escuela:
+  - cuaderno
+  - lápiz
+  - pizarra
+  - maestro
+  - tarea
+  - recreo
+  - letra
+  - número
+  - mochila
+  - libro
+  - lección
+  - campana
+  - escribir
+  - leer
+  - aprender
+  - enseñar
+  - preguntar
+  - contar
+  - dibujar
+  - repasar
+  - estudiar
+  - aplicado
+  - curioso
+  - atento
+  - bilingüe
+  puente_civico:
+  - vacuna
+  - posta
+  - enfermera
+  - documento
+  - partida
+  - autoridad
+  - derecho
+  - campaña
+  - charla
+  - registro
+  - apoyo
+  - jornada
+  - vacunar
+  - registrar
+  - atender
+  - informar
+  - explicar
+  - prevenir
+  - firmar
+  - solicitar
+  - proteger
+  - gratuito
+  - importante
+  - sano
+  - comunal
+  emociones_relaciones:
+  - alegría
+  - tristeza
+  - miedo
+  - esperanza
+  - cariño
+  - nostalgia
+  - consuelo
+  - abrazo
+  - lágrima
+  - sonrisa
+  - recuerdo
+  - silencio
+  - extrañar
+  - perdonar
+  - consolar
+  - agradecer
+  - alegrar
+  - preocupar
+  - llorar
+  - reír
+  - esperar
+  - contento
+  - triste
+  - agradecido
+  - solo
+  comercio_intercambio:
+  - mercado
+  - plátano
+  - pescado
+  - sal
+  - fósforo
+  - jabón
+  - deuda
+  - precio
+  - trueque
+  - ganancia
+  - bolsa
+  - cosecha
+  - vender
+  - comprar
+  - cambiar
+  - fiar
+  - pagar
+  - pesar
+  - ofrecer
+  - ahorrar
+  - regatear
+  - justo
+  - barato
+  - caro
+  - fresco
+  viaje_desplazamiento:
+  - lancha
+  - canoa
+  - motor
+  - equipaje
+  - camino
+  - puerto
+  - orilla
+  - quebrada
+  - hamaca
+  - provisión
+  - atardecer
+  - lluvia
+  - viajar
+  - partir
+  - llegar
+  - cargar
+  - descansar
+  - cruzar
+  - esperar
+  - despedirse
+  - regresar
+  - largo
+  - cansado
+  - lejano
+  - pesado
+lengths:
+  muy_corta:
+    phrase: entre 3 y 8 palabras
+    wc_min: 3
+    wc_max: 8
+    weight: 0.2
+  corta:
+    phrase: entre 9 y 15 palabras
+    wc_min: 9
+    wc_max: 15
+    weight: 0.1
+  media:
+    phrase: entre 16 y 35 palabras
+    wc_min: 16
+    wc_max: 35
+    weight: 0.4
+  larga:
+    phrase: entre 36 y 60 palabras
+    wc_min: 36
+    wc_max: 60
+    weight: 0.2
+  muy_larga:
+    phrase: entre 61 y 90 palabras
+    wc_min: 61
+    wc_max: 90
+    weight: 0.1
+discurso_conectado:
+  ratio: 0.12
+  domains:
+  - educacion_escuela
+  - narrativa_tradicional
+  - salud_cuerpo
+  actos:
+  - consejo_advertencia
+  lengths:
+  - larga
+  - muy_larga
+validation:
+  max_words: 120
+  length_tolerance_pct: 30
+  banned_terms:
+  - semáforo
+  - supermercado
+  - rascacielos
+  - ascensor
+  - autopista
+  - centro comercial
+  - estación de metro
+  - estación del metro
+  - wifi
+  - internet
+  - smartphone
+  - teléfono inteligente
+  - computadora
+  - aplicación móvil
+  - tarjeta de crédito
+  - cajero automático
+  - oficina corporativa
+  - shopping

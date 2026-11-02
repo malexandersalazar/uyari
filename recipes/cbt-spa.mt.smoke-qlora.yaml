@@ -1,0 +1,28 @@
+# Smoke test of the QLoRA code path with a tiny causal LM (runs on Windows via peft).
+id: cbt-spa.mt.smoke-qlora
+build: data-2026.11
+task: mt
+language: cbt_Latn
+primary: spa_Latn
+directions: [spa>cbt, cbt>spa]
+splits: {train: train, validation: validation}
+filters: {provenance: [human]}
+base_model: HuggingFaceTB/SmolLM2-135M-Instruct
+method: qlora
+lora: {r: 8, alpha: 16, dropout: 0.0, target: all-linear, backend: peft}
+train:
+  epochs: 1
+  max_steps: 20
+  lr: 2.0e-4
+  precision: bf16
+  batch_size: 4
+  grad_accum: 1
+  max_len: 384
+  warmup_ratio: 0.1
+  seed: 7
+  optimizer: adamw_torch
+eval:
+  max_new_tokens: 64
+  batch_size: 16
+  limit: 16
+output: models/mt-cbt-spa-smoke-qlora@v0.0

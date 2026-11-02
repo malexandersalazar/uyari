@@ -1,0 +1,35 @@
+# Muse Glimmer 30B, QLoRA (4-bit) with Unsloth: one model for Shawi <-> Spanish and Shawi <-> English
+# (4 directions). The headline model. The English side is machine-translated from the Spanish
+# (primary/eng_Latn); every Shawi sentence is human. Twice the examples of the Spanish-only recipe, so
+# 2 epochs instead of 3 (about 1.3x its steps). Fallback if time is short: cbt-spa.mt.glimmer-qlora.yaml.
+id: cbt.mt.glimmer-qlora
+build: data-2026.11
+task: mt
+language: cbt_Latn
+primaries: [spa_Latn, eng_Latn]
+directions: [spa>cbt, cbt>spa, eng>cbt, cbt>eng]
+splits: {train: train, validation: validation}
+filters: {provenance: [human], licenses: [cc-by-4.0]}
+base_model: meta-models/Muse-Glimmer-30B     # verify with scripts/check_4090.py
+method: qlora
+# Glimmer is image-text-to-text (MuseGlimmerForConditionalGeneration): LoRA on the language layers,
+# vision frozen (Unsloth FastModel). Its ATEM chat template defaults to "Reasoning strength: high";
+# translation answers directly. The same kwargs apply at training, in-process inference and on the
+# server (vLLM `chat_template_kwargs`).
+chat_template_kwargs: {reasoning_strength: low}
+lora: {r: 16, alpha: 32, dropout: 0.0, target: all-linear, backend: unsloth}
+train:
+  epochs: 2
+  lr: 1.0e-4
+  precision: bf16
+  batch_size: 1
+  grad_accum: 16
+  max_len: 512
+  warmup_ratio: 0.03
+  seed: 7
+  optimizer: adamw_8bit
+eval:
+  max_new_tokens: 256
+  batch_size: 8
+  server_adapter: mt-cbt                      # name when served by `uyari serve start`
+output: models/mt-cbt-glimmer30b-qlora@v0.1

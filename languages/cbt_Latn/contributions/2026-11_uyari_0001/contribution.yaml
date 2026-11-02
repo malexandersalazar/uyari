@@ -1,0 +1,20 @@
+# Contribution 2026-11_uyari_0001: human translations into cbt_Latn of primary spa_Latn,
+# commissioned and paid for by Alexander Salazar and Yuri Cavero (leads of the Shawi-Spanish case),
+# who hold the rights. Immutable once merged.
+id: 2026-11_uyari_0001
+language: cbt_Latn
+variety: _unspecified
+contributor_id: c-0001
+organization: Uyari project
+collection_dates:          # translation is ongoing; work after the end date goes in new contributions
+  start: '2026-06-01'
+  end: '2026-11-01'
+provenance:
+  text: human
+  audio: none
+license: cc-by-4.0          # commercial use allowed; credit required (DATA_LICENSE.md)
+consent:
+  template: commissioned-work.md
+  authority: Alexander Salazar and Yuri Cavero (rights holders)
+compensated: 'yes'
+source_primary: spa_Latn/2026-06_opus48_0001

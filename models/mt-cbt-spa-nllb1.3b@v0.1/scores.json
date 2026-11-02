@@ -1,0 +1,122 @@
+{
+  "test": {
+    "backend": "NllbTranslator",
+    "cbt>spa": {
+      "bleu": 13.37,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 13.6,
+          "chrf++": 37.69,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 10.5,
+          "chrf++": 33.52,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 5.27,
+          "chrf++": 21.68,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 16.9,
+          "chrf++": 39.88,
+          "n": 100
+        }
+      },
+      "chrf++": 36.48,
+      "n": 322
+    },
+    "limit": null,
+    "mean_chrf++": 37.35,
+    "scored_at": "2026-11-02T12:41:57+00:00",
+    "spa>cbt": {
+      "bleu": 4.48,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 4.39,
+          "chrf++": 37.79,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 2.93,
+          "chrf++": 37.57,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 3.78,
+          "chrf++": 27.4,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 5.97,
+          "chrf++": 40.02,
+          "n": 100
+        }
+      },
+      "chrf++": 38.23,
+      "n": 322
+    }
+  },
+  "validation": {
+    "backend": "NllbTranslator",
+    "cbt>spa": {
+      "bleu": 14.34,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 11.97,
+          "chrf++": 36.75,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 12.57,
+          "chrf++": 35.68,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 5.68,
+          "chrf++": 26.5,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 17.94,
+          "chrf++": 41.0,
+          "n": 97
+        }
+      },
+      "chrf++": 37.7,
+      "n": 328
+    },
+    "limit": null,
+    "mean_chrf++": 37.84,
+    "scored_at": "2026-11-02T12:39:58+00:00",
+    "spa>cbt": {
+      "bleu": 4.75,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 4.04,
+          "chrf++": 38.21,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 4.6,
+          "chrf++": 36.57,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 0.83,
+          "chrf++": 23.63,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 5.6,
+          "chrf++": 40.1,
+          "n": 97
+        }
+      },
+      "chrf++": 37.99,
+      "n": 328
+    }
+  }
+}

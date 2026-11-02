@@ -1,0 +1,104 @@
+{
+  "as_of": "2026-11-02",
+  "git": {
+    "commit": "43782d72bf2ecee061ea4330ff166ea25d551c8c",
+    "dirty": true
+  },
+  "languages": {
+    "cbt_Latn": {
+      "contributions": {
+        "excluded": [],
+        "included": [
+          {
+            "clips": 0,
+            "id": "2026-11_uyari_0001",
+            "license": "cc-by-4.0",
+            "pairs": 528,
+            "provenance": {
+              "audio": "none",
+              "text": "human"
+            },
+            "translators": 1
+          },
+          {
+            "clips": 0,
+            "id": "2026-11_uyari_0002",
+            "license": "cc-by-4.0",
+            "pairs": 2499,
+            "provenance": {
+              "audio": "none",
+              "text": "human"
+            },
+            "translators": 1
+          },
+          {
+            "clips": 0,
+            "id": "2026-11_uyari_0003",
+            "license": "cc-by-4.0",
+            "pairs": 548,
+            "provenance": {
+              "audio": "none",
+              "text": "human"
+            },
+            "translators": 1
+          }
+        ]
+      },
+      "counts": {
+        "chunks_translated": 3575,
+        "chunks_translated_by_domain": {
+          "comercio_intercambio": 1163,
+          "emociones_relaciones": 1195,
+          "puente_civico": 129,
+          "viaje_desplazamiento": 1088
+        },
+        "clips": 0,
+        "pairs": 3575,
+        "read_clips": 0,
+        "speakers": 0
+      },
+      "licenses": {
+        "cc-by-4.0": 7150
+      },
+      "primary": "spa_Latn",
+      "rows_excluded": {
+        "empty_translation": 3
+      },
+      "tables": {
+        "asr": {
+          "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "cbt_Latn/asr.parquet",
+          "rows": {},
+          "sha256": "17bf4ad34fc3a5d354861093fed3b095c0df8d404b19661ea458d91ee46cd052",
+          "test_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test_file": "cbt_Latn/asr.test.parquet",
+          "test_sha256": "17bf4ad34fc3a5d354861093fed3b095c0df8d404b19661ea458d91ee46cd052"
+        },
+        "mt": {
+          "content_sha256": "30e205adc99e68ed65973cccbb339683cd4b6a27fd11e8efa7f8050e9a56eaec",
+          "file": "cbt_Latn/mt.parquet",
+          "rows": {
+            "test": 644,
+            "train": 5850,
+            "validation": 656
+          },
+          "sha256": "05077e074e13a21f8ef436ae1c270af83f4d800cd52bfaf8943cdfd175fe1624",
+          "test_content_sha256": "8a50def4c7912dbd178ae87aa115d76483380d5a8ff161848cc656d11d44bd64",
+          "test_file": "cbt_Latn/mt.test.parquet",
+          "test_sha256": "842a94572c8de947a2cd3f5ab78a6332ee51a78be5bd772e471ce6d747940fda"
+        },
+        "tts": {
+          "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "cbt_Latn/tts.parquet",
+          "rows": {},
+          "sha256": "f6e9d50177d1a1ef3bd87952b2edbed4d9e453b01de209a6370aa466b5d256a5",
+          "test_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test_file": "cbt_Latn/tts.test.parquet",
+          "test_sha256": "f6e9d50177d1a1ef3bd87952b2edbed4d9e453b01de209a6370aa466b5d256a5"
+        }
+      }
+    }
+  },
+  "tag": "data-2026.11",
+  "uyari_version": "0.1.0"
+}

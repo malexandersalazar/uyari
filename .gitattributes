@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.xlsx binary
+*.parquet binary
+*.wav binary
+*.png binary
+*.bat text eol=crlf

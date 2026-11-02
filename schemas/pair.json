@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/pair.json",
+  "title": "Translation row (languages/<lang>/contributions/<id>/pairs.csv)",
+  "x-columns": ["chunk_id", "text", "replaces", "translator_id", "notes"],
+  "type": "object",
+  "required": ["chunk_id", "text", "translator_id"],
+  "properties": {
+    "chunk_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "text": {"type": "string", "minLength": 1},
+    "replaces": {"type": "string", "pattern": "^([0-9]{4}-[0-9]{2}_[a-z0-9]+_[0-9]{4}/[0-9a-f]{32})?$"},
+    "translator_id": {"type": "string", "pattern": "^t-[0-9]{4}$"},
+    "notes": {"type": "string"}
+  }
+}

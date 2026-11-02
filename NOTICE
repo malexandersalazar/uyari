@@ -1,0 +1,16 @@
+Uyari
+Copyright 2026 Alexander Salazar
+
+Uyari is an open toolkit, data and models for translation between Indigenous and official languages,
+in text and speech, created by Alexander Salazar: https://github.com/malexandersalazar/uyari
+
+Shawi-Spanish translations: Copyright 2026 Alexander Salazar and Yuri Cavero, licensed under
+CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+Spanish source sentences: licensed under CC BY 4.0.
+Code: licensed under the Apache License 2.0 (LICENSE).
+
+Models trained with Uyari also carry the license of their base model: NLLB-200 fine-tunes are
+CC BY-NC 4.0 (non-commercial); Muse Glimmer fine-tunes are Apache 2.0.
+
+If you build a product or service on Uyari, please tell its users, for example on an "About" page,
+that its translation models and data are open and can be reused and extended, with the link above.

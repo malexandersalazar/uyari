@@ -1,0 +1,35 @@
+# Trainer on every merge that adds data: build -> train -> evaluate -> promote -> card ->
+# NEEDS.md -> pull request. Runs on the self-hosted GPU runner (the RTX 4090).
+name: train
+on:
+  push:
+    branches: [main]
+    paths: ["languages/**/contributions/**", "primary/**"]
+  workflow_dispatch:
+    inputs:
+      language: {default: cbt_Latn}
+      force_build: {type: boolean, default: false}
+
+concurrency: {group: trainer, cancel-in-progress: false}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  trainer:
+    runs-on: [self-hosted, linux, gpu]
+    env:
+      PYTHONUTF8: "1"
+      GH_TOKEN: ${{ github.token }}
+      UV_PROJECT_ENVIRONMENT: /opt/uyari/.venv
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, clean: false}   # keep builds/ parquet and model weights between runs
+      - run: |
+          git config user.name "uyari-trainer"
+          git config user.email "uyari-trainer@users.noreply.github.com"
+      - run: uv run --no-sync uyari validate
+      - run: >-
+          uv run --no-sync uyari trainer --language "${{ inputs.language || 'cbt_Latn' }}" --open-pr
+          ${{ inputs.force_build && '--force-build' || '' }}

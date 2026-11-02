@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/review.json",
+  "title": "review.yaml written at merge (or drafted by the Gatekeeper)",
+  "type": "object",
+  "required": ["reviewed_by", "decided_on", "decision"],
+  "properties": {
+    "reviewed_by": {"type": "string"},
+    "decided_on": {"type": "string"},
+    "agent_score": {"type": ["number", "null"]},
+    "decision": {"enum": ["submitted", "in_review", "returned", "merged", "revoked"]},
+    "notes": {"type": "string"}
+  }
+}

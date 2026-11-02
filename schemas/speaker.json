@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/speaker.json",
+  "title": "Speaker row (speakers.csv); pseudonymous, adults only",
+  "x-columns": ["speaker_id", "age_band", "sex", "first_language", "consent_ref"],
+  "type": "object",
+  "required": ["speaker_id", "age_band", "consent_ref"],
+  "properties": {
+    "speaker_id": {"type": "string", "pattern": "^s-[0-9]{4}$"},
+    "age_band": {"enum": ["18-29", "30-44", "45-59", "60+"]},
+    "sex": {"enum": ["f", "m", "x", ""]},
+    "first_language": {"type": "string"},
+    "consent_ref": {"type": "string", "minLength": 1}
+  }
+}

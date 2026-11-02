@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Blocks a commit that would publish a translator's real name or a seed filename.
+# Enable once per clone:  git config core.hooksPath .githooks
+export PYTHONUTF8=1
+if [ -x .venv/Scripts/uyari.exe ]; then UYARI=.venv/Scripts/uyari.exe; elif [ -x .venv/bin/uyari ]; then UYARI=.venv/bin/uyari; else UYARI="uv run --no-sync uyari"; fi
+$UYARI privacy-check || { echo "privacy-check failed: remove the names above before committing"; exit 1; }

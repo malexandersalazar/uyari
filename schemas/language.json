@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uyari/language.json",
+  "title": "languages/<id>/language.yaml",
+  "type": "object",
+  "required": ["id", "iso639_3", "script", "glottocode", "display_name", "iso_name", "primary",
+    "steward", "community_authority", "apostrophe"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z]{3}_[A-Z][a-z]{3}$"},
+    "iso639_3": {"type": "string", "pattern": "^[a-z]{3}$"},
+    "script": {"type": "string", "pattern": "^[A-Z][a-z]{3}$"},
+    "glottocode": {"type": "string", "pattern": "^([a-z0-9]{4}[0-9]{4}|TODO|)$"},
+    "display_name": {"type": "string"},
+    "iso_name": {"type": "string"},
+    "primary": {"type": "string", "pattern": "^[a-z]{3}_[A-Z][a-z]{3}$"},
+    "steward": {"type": "string"},
+    "community_authority": {"type": "string"},
+    "apostrophe": {"type": "string", "maxLength": 1},
+    "apostrophe_variants": {"type": "array", "items": {"type": "string", "maxLength": 1}},
+    "training_orthography": {"type": "string"},
+    "trainer": {
+      "type": "object",
+      "properties": {
+        "recipes": {"type": "array", "items": {"type": "string"}},
+        "min_growth": {"type": "number"}
+      }
+    }
+  }
+}
