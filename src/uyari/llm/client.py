@@ -9,6 +9,9 @@ Every call goes through the data-policy guard and the spend ledger. The Response
 
 Optional parameters the server rejects (400 naming them) are dropped once and remembered in
 ``.uyari/api_compat.json``; ``uyari llm ping`` shows what was accepted.
+
+Bring your own key (the demo): ``api_key="..."`` uses only that key, never the environment, and the call is
+not written to the project's ledger (the caller pays; nothing about the call is stored).
 """
 
 from __future__ import annotations
@@ -86,7 +89,7 @@ def _usage(data: dict) -> tuple[int, int, int, int]:
 
 class LLMClient:
     def __init__(self, paths: Paths, model: str | None, data_class: str, command: str,
-                 budget: RunBudget | None = None, batch: str = ""):
+                 budget: RunBudget | None = None, batch: str = "", api_key: str | None = None):
         self.paths = paths
         self.catalog = load_catalog(paths)
         self.spec: ModelSpec = self.catalog.get(model, data_class)
@@ -97,7 +100,11 @@ class LLMClient:
         self.budget = budget
         self._compat_path = paths.state / "api_compat.json"
         self._compat = json.loads(self._compat_path.read_text(encoding="utf-8")) if self._compat_path.is_file() else {}
-        if self.spec.api in ("responses",) and not self.spec.api_key:
+        self.byok = api_key is not None
+        self._key = api_key.strip() if self.byok else self.spec.api_key
+        if self.byok and not self._key:
+            raise LLMError("no API key given")
+        if self.spec.api in ("responses",) and not self._key:
             raise LLMError(f"{self.spec.key_env} is not set (see .env.example)")
         if not self.spec.url:
             raise LLMError(f"{self.spec.url_env} is not set")
@@ -157,8 +164,8 @@ class LLMClient:
     def _respond(self, instructions, prompt, schema, max_output_tokens, temperature, expected_cost, meta,
                  timeout, max_retries) -> LLMResponse:
         headers = {"Content-Type": "application/json"}
-        if self.spec.api_key:
-            headers["Authorization"] = f"Bearer {self.spec.api_key}"
+        if self._key:
+            headers["Authorization"] = f"Bearer {self._key}"
         attempt, dropped = 0, 0
         while True:
             body = self._body(instructions, prompt, schema, max_output_tokens, temperature)
@@ -197,6 +204,8 @@ class LLMClient:
                                request_id=r.headers.get("x-request-id", "") or str(data.get("id", "")), raw=data)
             if self.budget:
                 self.budget.charge(cost, reserved_usd=expected_cost)
+            if self.byok:
+                return resp
             self.ledger.record(run_id=self.run_id, command=self.command, model=self.spec.key, batch=self.batch,
                                data_class=self.data_class, input_tokens=inp, cached_tokens=cached,
                                output_tokens=out, reasoning_tokens=reasoning, cost_usd=round(cost, 8),

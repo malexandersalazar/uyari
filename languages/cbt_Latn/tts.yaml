@@ -1,0 +1,22 @@
+# How Shawi text is read aloud. Read by src/uyari/pipelines/tts/voice.py (the demo's Listen button, uyari s2s,
+# uyari tts check-voice).
+#
+# The voice is Meta's MMS voice for Shawi, trained on Bible readings in an older, Spanish-based spelling. Its
+# alphabet has no k, w, ʼ or ñ, and it drops unknown letters without a word. These rules rewrite our text into
+# its alphabet just before it is spoken; every screen keeps showing our spelling. To change how a word sounds,
+# change a rule here (the steward's call), never the text.
+voice: facebook/mms-tts-cbt     # CC BY-NC 4.0, 16 kHz, runs locally on CPU
+seed: 7                         # the voice samples noise: the same seed on every piece, the same sound every time
+
+# Applied in order, after lowercasing and Unicode NFC. `before`: only when the next letter is one of these.
+rules:
+  - {find: ["ʼ", "'", "’"], write: "ꞌ"}   # glottal stop (ipiʼ): the voice writes it as the saltillo, U+A78C
+  - {find: k, before: [e, i], write: qu}  # ke, ki -> que, qui
+  - {find: k, write: c}
+  - {find: w, write: hu}
+  - {find: ñ, write: ny}
+
+# The voice reads no punctuation, so text is spoken in pieces cut at these marks, with a pause between them.
+split_at: ".,;:?!¿¡"
+sentence_end: ".?!"             # a piece cut here is followed by the sentence pause; any other cut, the comma pause
+pause_seconds: {sentence: 0.35, comma: 0.15}

@@ -12,14 +12,25 @@ Backends:
     on Windows to exercise the same data path with a tiny model.
 
 One explicit loop for both, loss on the completion only: the chat template renders
-prompt + completion, the prompt part is masked with -100. Checkpoint selection by validation
-loss each epoch (generation on a 30B model is too slow to run every epoch); chrF++ comes from
-``uyari eval`` afterwards. Only the adapter is saved (``<output>/adapter``).
+prompt + completion, the prompt part is masked with -100. Checkpoint selection:
+
+* ``eval.selection: chrf``: greedy chrF++ on a fixed, direction-balanced validation subset every
+  ``select_every`` epochs and at the end; the adapter with the best score is kept. The subset is
+  ``select_limit`` examples, or ``select_into`` per direction into the Indigenous language plus ``select_out``
+  per direction out of it. ``select_on: into`` scores only the directions into it (``all``, the default, the
+  mean over every direction). Validation loss is still logged each epoch, not used.
+* ``train.into_sources_per_target: k``: with several official languages, each Indigenous target sentence
+  appears once per official language and is memorized that many times faster than the directions out of it.
+  Each epoch keeps it from only ``k`` of them (rotating with the epoch); the directions out of it keep all.
+* otherwise validation loss each epoch (v0.1; it stopped Glimmer after one epoch).
+
+Only the adapter is saved (``<output>/adapter``).
 """
 
 from __future__ import annotations
 
 import math
+import random
 import re
 from pathlib import Path
 
@@ -29,6 +40,7 @@ from uyari.pipelines.mt.common import (
     length_bucketed_batches,
     load_split,
     seed_everything,
+    selection_subset,
     write_meta,
 )
 from uyari.recipes import Recipe
@@ -156,6 +168,80 @@ def load_model(recipe: Recipe, for_training: bool = True, adapter_dir: Path | No
     return model, chat, backend
 
 
+def into_rotation(rows: list[dict], language: str, k: int | None, seed: int, epoch: int) -> list[int]:
+    """Indices of ``rows`` to train on this epoch: every example out of ``language``, and each target sentence
+    into it from only ``k`` of its source languages, chosen anew each epoch (all of them if ``k`` is None)."""
+    if not k:
+        return list(range(len(rows)))
+    groups: dict[tuple, list[int]] = {}
+    for i, r in enumerate(rows):
+        if r["tgt_lang"] == language:
+            groups.setdefault((r["chunk_id"], r["tgt"]), []).append(i)
+    rng = random.Random(seed * 7919 + epoch)
+    drop = set()
+    for key in sorted(groups):
+        idx = groups[key]
+        if len(idx) > k:
+            drop |= set(idx) - set(rng.sample(idx, k))
+    return [i for i in range(len(rows)) if i not in drop]
+
+
+def selection_rows(rows: list[dict], language: str, ev: dict, seed: int) -> list[dict]:
+    """The fixed validation subset for chrF++ selection (see the module docstring)."""
+    if "select_into" not in ev and "select_out" not in ev:
+        return selection_subset(rows, int(ev.get("select_limit", 480)), seed)
+    into = [r for r in rows if r["tgt_lang"] == language]
+    out = [r for r in rows if r["tgt_lang"] != language]
+    n_into = len({r["src_lang"] for r in into})
+    n_out = len({r["tgt_lang"] for r in out})
+    return (selection_subset(into, int(ev.get("select_into", 40)) * n_into, seed)
+            + selection_subset(out, int(ev.get("select_out", 40)) * n_out, seed))
+
+
+def selection_metric(scores: dict, language: str, on: str = "all") -> dict:
+    """``{"score": what selection maximizes, "into": mean into ``language``, "out": mean out of it}`` from
+    per-direction chrF++ (``{"spa>cbt": 41.2, ...}``)."""
+    iso = language[:3]
+    into = [v for k, v in scores.items() if k.endswith(f">{iso}")]
+    out = [v for k, v in scores.items() if k.startswith(f"{iso}>")]
+    mean = lambda xs: round(sum(xs) / len(xs), 2) if xs else None  # noqa: E731
+    res = {"into": mean(into), "out": mean(out), "all": mean(into + out)}
+    if on not in res:
+        raise ValueError(f"eval.select_on must be into, out or all, not {on!r}")
+    return {"score": res[on] if res[on] is not None else res["all"], **res}
+
+
+def set_mode(model, backend: str, inference: bool) -> None:
+    """Switch between generation and training (Unsloth patches both ways; PEFT is eval/train)."""
+    if backend == "unsloth":
+        try:
+            from unsloth import FastModel as Fast
+        except ImportError:
+            from unsloth import FastLanguageModel as Fast
+        (Fast.for_inference if inference else Fast.for_training)(model)
+    else:
+        model.eval() if inference else model.train()
+
+
+def selection_score(model, chat, backend: str, rows: list[dict], max_new_tokens: int, batch_size: int) -> dict:
+    """``{"mean": mean chrF++ over directions, "<src>><tgt>": chrF++, ...}`` of greedy outputs on ``rows``."""
+    from uyari.pipelines.mt.metrics import corpus_scores
+
+    set_mode(model, backend, inference=True)
+    try:
+        hyps = generate(model, chat, [r["prompt"] for r in rows], max_new_tokens=max_new_tokens,
+                        batch_size=batch_size)
+    finally:
+        set_mode(model, backend, inference=False)
+    out = {}
+    for d in sorted({(r["src_lang"], r["tgt_lang"]) for r in rows}):
+        idx = [i for i, r in enumerate(rows) if (r["src_lang"], r["tgt_lang"]) == d]
+        out[f"{d[0][:3]}>{d[1][:3]}"] = corpus_scores([hyps[i] for i in idx], [rows[i]["tgt_model"] for i in idx])[
+            "chrf++"] or 0.0
+    out = {"mean": round(sum(out.values()) / max(1, len(out)), 2), **out}
+    return out
+
+
 def _collate(batch, pad_id):
     import torch
 
@@ -193,12 +279,20 @@ def train_causal(paths: Paths, recipe: Recipe, data_dir: Path, out_dir: Path, ma
             out.append((ids, lab))
         return out, skipped
 
-    train, skipped = encode(load_split(data_dir, "train"))
-    val, _ = encode(load_split(data_dir, "validation")[: int(recipe.eval.get("loss_limit", 400))])
+    train_rows = load_split(data_dir, "train")
+    train, skipped = encode(train_rows)
+    val_rows = load_split(data_dir, "validation")
+    val, _ = encode(val_rows[: int(recipe.eval.get("loss_limit", 400))])
+    ev = recipe.eval
+    by_chrf = ev.get("selection") == "chrf"
+    select_on = ev.get("select_on", "all")
+    sel = selection_rows(val_rows, recipe.language, ev, seed) if by_chrf else []
+    k_into = cfg.get("into_sources_per_target")
     lengths = [len(a) for a, _ in train]
     bs, accum = int(cfg.get("batch_size", 1)), int(cfg.get("grad_accum", 16))
     epochs = int(cfg.get("epochs", 3))
-    steps_per_epoch = math.ceil(math.ceil(len(train) / bs) / accum)
+    per_epoch = len(into_rotation(train_rows, recipe.language, k_into, seed, 0))
+    steps_per_epoch = math.ceil(math.ceil(per_epoch / bs) / accum)
     total = min(max_steps or cfg.get("max_steps") or 10**9, steps_per_epoch * epochs)
     epochs = min(epochs, math.ceil(total / steps_per_epoch))
 
@@ -210,8 +304,11 @@ def train_causal(paths: Paths, recipe: Recipe, data_dir: Path, out_dir: Path, ma
     else:
         opt = torch.optim.AdamW(params, lr=float(cfg.get("lr", 1e-4)), weight_decay=0.0)
     sched = get_linear_schedule_with_warmup(opt, int(total * float(cfg.get("warmup_ratio", 0.03))), total)
-    log(event="start", recipe=recipe.id, backend=backend, examples=len(train), truncated=skipped, steps=total,
-        epochs=epochs, trainable_params=sum(p.numel() for p in params))
+    every = max(1, round(steps_per_epoch * float(ev.get("select_every", 1.0)))) if by_chrf else 0
+    log(event="start", recipe=recipe.id, backend=backend, examples=len(train), examples_per_epoch=per_epoch,
+        truncated=skipped, steps=total, epochs=epochs, trainable_params=sum(p.numel() for p in params),
+        selection=(f"chrf ({select_on}) on {len(sel)} validation examples every {every} steps" if by_chrf
+                   else "val_loss"))
 
     def val_loss() -> float:
         model.eval()
@@ -227,10 +324,33 @@ def train_causal(paths: Paths, recipe: Recipe, data_dir: Path, out_dir: Path, ma
         return tot / max(1, n)
 
     step, best = 0, float("inf")
+    best_chrf = -1.0
     adapter = out_dir / "adapter"
+
+    def select(epoch: int) -> None:
+        """chrF++ selection point: keep the adapter if its score (``select_on``) is the best so far."""
+        nonlocal best_chrf
+        sc = selection_score(model, chat, backend, sel, int(ev.get("max_new_tokens", 256)),
+                             int(ev.get("select_batch_size", ev.get("batch_size", 8))))
+        m = selection_metric({k: v for k, v in sc.items() if k != "mean"}, recipe.language, select_on)
+        better = m["score"] > best_chrf
+        log(event="select", epoch=round(step / steps_per_epoch, 2), step=step, selection_chrf=m["score"],
+            into=m["into"], out=m["out"], by_direction={k: v for k, v in sc.items() if k != "mean"}, kept=better)
+        if better:
+            best_chrf = m["score"]
+            model.save_pretrained(str(adapter))
+            chat.save(str(adapter))
+            write_meta(out_dir, recipe, "causal_lora", {
+                "adapter": "adapter", "backend": backend, "selection": "chrf", "best_epoch": epoch,
+                "best_epochs_done": round(step / steps_per_epoch, 2), "steps": step,
+                "selection_chrf_greedy": m["score"], "selection_on": select_on, "selection_into": m["into"],
+                "selection_out": m["out"], "selection_by_direction": {k: v for k, v in sc.items() if k != "mean"},
+                "selection_examples": len(sel), "into_sources_per_target": k_into})
+
     model.train()
     for epoch in range(epochs):
-        batches = length_bucketed_batches(lengths, bs, seed, epoch)
+        idx = into_rotation(train_rows, recipe.language, k_into, seed, epoch)
+        batches = [[idx[j] for j in b] for b in length_bucketed_batches([lengths[i] for i in idx], bs, seed, epoch)]
         running = 0.0
         for bi, b in enumerate(batches):
             ids, att, lab = _collate([train[i] for i in b], pad_id)
@@ -248,11 +368,13 @@ def train_causal(paths: Paths, recipe: Recipe, data_dir: Path, out_dir: Path, ma
                     mem = torch.cuda.max_memory_reserved() / 2**30 if torch.cuda.is_available() else 0
                     log(event="step", epoch=epoch, step=step, loss=round(running / (bi + 1), 4),
                         lr=sched.get_last_lr()[0], peak_vram_gib=round(mem, 2))
+                if by_chrf and (step % every == 0 or step >= total):
+                    select(epoch)
                 if step >= total:
                     break
         vl = val_loss()
         log(event="epoch", epoch=epoch, step=step, val_loss=round(vl, 4))
-        if vl < best:
+        if not by_chrf and vl < best:
             best = vl
             model.save_pretrained(str(adapter))
             chat.save(str(adapter))
@@ -260,7 +382,7 @@ def train_causal(paths: Paths, recipe: Recipe, data_dir: Path, out_dir: Path, ma
                                                         "steps": step, "selection_val_loss": round(vl, 4)})
         if step >= total:
             break
-    log(event="done", best_val_loss=best)
+    log(event="done", **({"best_selection_chrf": best_chrf} if by_chrf else {"best_val_loss": best}))
     return out_dir
 
 
@@ -292,13 +414,19 @@ def generate(model, chat: ChatText, prompts: list[list[dict]], max_new_tokens: i
 
 
 _SPECIAL = re.compile(r"<\|[^|>]{1,40}\|>|<end_of_turn>|</s>|<eos>")
+_HEADER = re.compile(r"^(?:\s|<\|[^|>]{1,40}\|>|to=\S+|assistant|final|analysis|commentary)*$")
 
 
 def clean_completion(text: str) -> str:
-    """The translation from a raw completion: after the last channel marker (``<|message|>``, Glimmer's
-    ATEM format), before any special token, first line only."""
+    """The translation from a raw completion: the last non-empty message after a channel marker
+    (``<|message|>``, Glimmer's ATEM format), before any special token, first line only. A stray marker after
+    the translation (``…paʼ<|message|>``, which the model sometimes emits) is ignored rather than leaving
+    nothing."""
     if "<|message|>" in text:
-        text = text.rsplit("<|message|>", 1)[1]
+        segs = text.split("<|message|>")
+        body = [p for p in segs[1:] if _SPECIAL.split(p, 1)[0].strip()]
+        # A server may already have cut the header (`` to=user<|message|>``): then the text is before the marker.
+        text = body[-1] if body else "" if _HEADER.match(segs[0]) else segs[0]
     m = _SPECIAL.search(text)
     if m:
         text = text[: m.start()]

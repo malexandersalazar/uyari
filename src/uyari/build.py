@@ -210,6 +210,7 @@ def _build_language(paths: Paths, lang: str, primaries: dict[str, PrimaryCorpus]
         rows[t].sort(key=_sort_key(cols))
     lang_manifest = {
         "primary": L.primary,
+        "officials": sorted([L.primary, *others]),
         "contributions": {"included": included, "excluded": excluded},
         "rows_excluded": dict(rx),
         "counts": {
@@ -227,14 +228,29 @@ def _build_language(paths: Paths, lang: str, primaries: dict[str, PrimaryCorpus]
 
 
 def run_build(paths: Paths, tag: str, as_of: date | None = None, verify: bool = False,
-              dry_run: bool = False, languages: list[str] | None = None) -> BuildResult:
+              dry_run: bool = False, languages: list[str] | None = None,
+              officials: list[str] | None = None) -> BuildResult:
+    """``officials``: the official languages each Indigenous text is paired with (default: every folder under
+    ``primary/``). A build tag is only reproducible with the same list, so the manifest records it."""
     as_of = as_of or date.today()
     out_dir = paths.builds / tag
     res = BuildResult(tag=tag, out_dir=out_dir, dry_run=dry_run or verify)
-    primaries = {p: load_primary(paths, p) for p in list_primaries(paths)}
+    langs = languages or list_languages(paths)
+    available = list_primaries(paths)
+    if officials is None:
+        names = available
+    else:
+        unknown = sorted(set(officials) - set(available))
+        if unknown:
+            raise ValueError(f"no primary corpus for {unknown} (have {available})")
+        needed = sorted({load_language(paths, lang).primary for lang in langs} - set(officials))
+        if needed:
+            raise ValueError(f"officials must include each language's primary: add {needed}")
+        names = sorted(set(officials))
+    primaries = {p: load_primary(paths, p) for p in names}
     manifest = {"tag": tag, "as_of": as_of.isoformat(), "uyari_version": __version__, "git": _git(paths),
                 "languages": {}}
-    for lang in languages or list_languages(paths):
+    for lang in langs:
         lm, rows = _build_language(paths, lang, primaries, as_of)
         lm["tables"] = {}
         for t, cols in TABLES.items():

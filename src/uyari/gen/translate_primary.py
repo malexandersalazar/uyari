@@ -8,7 +8,8 @@ training through the second language.
 
 Official-language text only (Spanish in, English out), so the Muse Spark Contributor tier is allowed.
 Each request carries ``per_request`` sentences as JSON to amortize the instructions. Every raw response
-is cached in ``runs/primary-translate/<batch>/responses.jsonl`` before it is parsed, chunks already in
+is cached in ``runs/primary-translate/<target>/<batch>/responses.jsonl`` before it is parsed (per target:
+request ids depend only on the chunks, so one batch id serves every language), chunks already in
 the output file are skipped, so a re-run never pays twice. Rejected items are retried once, one per
 request; what still fails is listed in ``failures.jsonl`` and left out.
 """
@@ -43,6 +44,8 @@ SCHEMA = {
         "type": "object", "additionalProperties": False, "required": ["id", "text"],
         "properties": {"id": {"type": "string"}, "text": {"type": "string"}}}}},
 }
+# Short sentences can be identical in these languages ("Contemos rápido antes de partir" is also Portuguese).
+SAME_AS_SPANISH_OK = {"por_Latn", "ita_Latn"}
 _WORD = re.compile(r"[^\W\d_]+", re.UNICODE)
 _SPANISH = {"el", "la", "los", "las", "de", "del", "que", "y", "en", "un", "una", "con", "por", "para", "es",
             "está", "no", "se", "mi", "su", "pero", "muy", "también", "cuando", "porque", "nosotros"}
@@ -63,8 +66,8 @@ def prompt_version(src: str, tgt: str) -> str:
     return "tv-" + hashlib.sha1(system_prompt(src, tgt).encode("utf-8")).hexdigest()[:12]
 
 
-def run_dir(paths: Paths, batch: str):
-    return paths.runs / "primary-translate" / batch
+def run_dir(paths: Paths, tgt: str, batch: str):
+    return paths.runs / "primary-translate" / tgt / batch
 
 
 def out_file(paths: Paths, tgt: str, batch: str):
@@ -75,10 +78,12 @@ def translated_ids(paths: Paths, lang: str) -> set[str]:
     return {p["chunk_id"] for c in load_contributions(paths, lang) for p in c.pairs if p.get("chunk_id")}
 
 
-def select_chunks(paths: Paths, src: str, only_translated_in: str | None = None, limit: int | None = None
-                  ) -> list[dict]:
+def select_chunks(paths: Paths, src: str, only_translated_in: str | None = None, limit: int | None = None,
+                  source_batch: str | None = None) -> list[dict]:
     pc = load_primary(paths, src)
     rows = [r for r in pc.chunks.values() if r.get("status") == "active"]
+    if source_batch:
+        rows = [r for r in rows if r.get("source_batch_id") == source_batch]
     if only_translated_in:
         keep = translated_ids(paths, only_translated_in)
         rows = [r for r in rows if r["chunk_id"] in keep]
@@ -138,7 +143,8 @@ def check(src_text: str, out: str, tgt: str) -> str:
     wc = word_count(out)
     if not 1 <= wc <= 150:
         return f"{wc} words"
-    if normalize_official(out).casefold() == normalize_official(src_text).casefold() and wc > 2:
+    if (normalize_official(out).casefold() == normalize_official(src_text).casefold() and wc > 2
+            and not (tgt in SAME_AS_SPANISH_OK and wc <= 8)):
         return "unchanged"
     if tgt == "eng_Latn" and wc > 3:
         words = [w.casefold() for w in _WORD.findall(out)]
@@ -159,12 +165,15 @@ def _row(src_row: dict, text: str, src: str, model: str, pv: str, today: str) ->
 def run_translate(paths: Paths, batch: str, src: str = "spa_Latn", tgt: str = "eng_Latn", model: str | None = None,
                   only_translated_in: str | None = None, limit: int | None = None, per_request: int = 20,
                   estimate_only: bool = False, max_usd: float | None = None, assume_yes: bool = False,
-                  concurrency: int = 8, console=None) -> dict:
+                  concurrency: int = 8, console=None, source_batch: str | None = None) -> dict:
     cat = load_catalog(paths)
     model = cat.get(model, "official").key
-    d, out_f = run_dir(paths, batch), out_file(paths, tgt, batch)
+    d, out_f = run_dir(paths, tgt, batch), out_file(paths, tgt, batch)
     done = {r["chunk_id"]: r for r in read_csv(out_f)} if out_f.is_file() else {}
-    rows = [r for r in select_chunks(paths, src, only_translated_in, limit) if r["chunk_id"] not in done]
+    # A chunk the target already has in another batch file is never translated again (one row per chunk id).
+    elsewhere = {cid for cid, f in load_primary(paths, tgt).file_of.items() if f.resolve() != out_f.resolve()}
+    rows = [r for r in select_chunks(paths, src, only_translated_in, limit, source_batch)
+            if r["chunk_id"] not in done and r["chunk_id"] not in elsewhere]
     cached = {r["request_id"]: r for r in read_jsonl(d / "responses.jsonl")}
     reqs = make_requests(rows, per_request)
     to_send = [r for r in reqs if r["request_id"] not in cached]

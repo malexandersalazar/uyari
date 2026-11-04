@@ -41,3 +41,29 @@ def test_takedown_excludes_contribution(fixture_root):
     excl = after.manifest["languages"]["qaa_Latn"]["contributions"]["excluded"]
     assert excl and excl[0]["id"] == "2026-10_fixture_0001"
     assert after.manifest["languages"]["qaa_Latn"]["counts"]["clips"] == 0
+
+
+def test_officials_limits_the_languages_paired_and_keeps_the_hash(fixture_root):
+    import shutil
+
+    import pytest
+
+    as_of = date(2026, 11, 2)
+    before = run_build(fixture_root, "t", as_of=as_of, dry_run=True).manifest["languages"]["qaa_Latn"]
+    extra = fixture_root.primary_dir("fra_Latn") / "chunks" / "translated"
+    extra.mkdir(parents=True)
+    shutil.copy(fixture_root.primary_dir("spa_Latn") / "chunks/generated/fixture.csv", extra / "fixture.csv")
+
+    every = run_build(fixture_root, "t", as_of=as_of, dry_run=True).manifest["languages"]["qaa_Latn"]
+    assert every["officials"] == ["fra_Latn", "spa_Latn"]
+    assert sum(every["tables"]["mt"]["rows"].values()) == 2 * sum(before["tables"]["mt"]["rows"].values())
+
+    only = run_build(fixture_root, "t", as_of=as_of, dry_run=True, officials=["spa_Latn"]).manifest
+    only = only["languages"]["qaa_Latn"]
+    assert only["officials"] == ["spa_Latn"]
+    for t in ("mt", "asr", "tts"):  # a new language folder does not change a build that leaves it out
+        assert only["tables"][t]["content_sha256"] == before["tables"][t]["content_sha256"]
+    with pytest.raises(ValueError, match="primary"):
+        run_build(fixture_root, "t", as_of=as_of, dry_run=True, officials=["fra_Latn"])
+    with pytest.raises(ValueError, match="no primary corpus"):
+        run_build(fixture_root, "t", as_of=as_of, dry_run=True, officials=["spa_Latn", "xxx_Latn"])

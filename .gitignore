@@ -11,6 +11,8 @@ models/**/checkpoints/
 models/**/adapter/
 *.gguf
 check_4090_report.json
+unsloth_compiled_cache/
+.gradio/
 
 # Python
 .venv/

@@ -1,8 +1,10 @@
 """``uyari serve``: one local OpenAI-compatible server for Muse Glimmer on the 4090.
 
 The base model answers the Gatekeeper; LoRA adapters (``name=path``) answer the demo and
-``uyari eval``. One copy of the model sits in VRAM. Backend: vLLM (preferred) or llama-server
-(GGUF + GGUF LoRA), whichever ``scripts/check_4090.py`` proved.
+``uyari eval``. One copy of the model sits in VRAM. Backend: llama-server with a GGUF of the base (Unsloth's
+4-bit ``Muse-Glimmer-30B-UD-Q4_K_XL``, 15 GB, from the Hugging Face cache or ``GLIMMER_GGUF``) and each
+adapter's ``adapter.gguf`` (``scripts/lora_to_gguf.py``); vLLM otherwise. vLLM cannot load the 4-bit
+checkpoint (it rejects bitsandbytes), so ``auto`` takes llama-server whenever a GGUF is there.
 
 ``gpu_session()`` is the GPU lock the Trainer takes: it stops the server around a GPU job and
 restarts it afterwards, so serving and training never fight for the 24 GB.
@@ -37,6 +39,11 @@ def _alive(pid: int) -> bool:
     if sys.platform == "win32":
         out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}", "/NH"], capture_output=True, text=True)
         return str(pid) in out.stdout
+    try:  # a server this process started and that has exited is a zombie until reaped: reap it, it is gone
+        if os.waitpid(pid, os.WNOHANG)[0] == pid:
+            return False
+    except ChildProcessError:  # not our child
+        pass
     try:
         os.kill(pid, 0)
         return True
@@ -65,6 +72,30 @@ def _ready(port: int) -> bool:
         return httpx.get(f"http://127.0.0.1:{port}/v1/models", timeout=3).status_code == 200
     except httpx.HTTPError:
         return False
+
+
+GGUF_REPO, GGUF_FILE = "unsloth/Muse-Glimmer-30B-GGUF", "Muse-Glimmer-30B-UD-Q4_K_XL.gguf"
+
+
+def default_gguf() -> Path | None:
+    """``GLIMMER_GGUF``, else Unsloth's 4-bit GGUF if it is in the Hugging Face cache (never downloaded here)."""
+    env = os.environ.get("GLIMMER_GGUF")
+    if env:
+        return Path(env)
+    try:
+        from huggingface_hub import try_to_load_from_cache
+    except ImportError:
+        return None
+    f = try_to_load_from_cache(GGUF_REPO, GGUF_FILE)
+    return Path(f) if isinstance(f, str) else None
+
+
+def gguf_lora(adapter_dir: str | Path) -> Path:
+    """The GGUF form of a PEFT adapter folder, as llama-server loads it."""
+    f = Path(adapter_dir) / "adapter.gguf"
+    if not f.is_file():
+        raise RuntimeError(f"{f} missing: run `uv run --no-sync python scripts/lora_to_gguf.py {adapter_dir}`")
+    return f
 
 
 def default_adapters(paths: Paths) -> list[str]:
@@ -103,19 +134,26 @@ def start(paths: Paths, adapters: list[str] | None = None, backend: str = "auto"
     log = paths.state / "serve.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     cmd: list[str] = []
-    if backend in ("auto", "vllm") and shutil.which("vllm"):
+    gguf = gguf or default_gguf()
+    if backend == "auto":
+        backend = "llama" if gguf and shutil.which("llama-server") else "vllm"
+    if backend == "vllm" and shutil.which("vllm"):
         backend = "vllm"
         cmd = [shutil.which("vllm"), "serve", base, "--port", str(port), "--max-model-len", "2048",
                "--quantization", "bitsandbytes", "--gpu-memory-utilization", "0.90"]
         if adapters:
             cmd += ["--enable-lora", "--max-lora-rank", "16", "--lora-modules", *adapters]
-    elif backend in ("auto", "llama") and shutil.which("llama-server"):
+    elif backend == "llama" and shutil.which("llama-server"):
         if not gguf:
             raise RuntimeError("llama-server needs --gguf (Glimmer converted to GGUF)")
-        backend = "llama"
-        cmd = [shutil.which("llama-server"), "-m", str(gguf), "--port", str(port), "-ngl", "999", "-c", "2048"]
+        # 8 slots of 1,024 tokens: a translation prompt is about 100 tokens plus at most 256 generated, and
+        # `uyari eval` sends 8 at a time. One adapter at a time: llama-server applies every --lora to every request.
+        cmd = [shutil.which("llama-server"), "-m", str(gguf), "--port", str(port), "-ngl", "999", "-c", "8192",
+               "-np", "8"]
+        if len(adapters) > 1:
+            raise RuntimeError(f"llama-server applies every adapter to every request; start one of {adapters}")
         for a in adapters:
-            cmd += ["--lora", a.split("=", 1)[1]]
+            cmd += ["--lora", str(gguf_lora(a.split("=", 1)[1]).resolve())]
     else:
         raise RuntimeError("no server backend: `uv tool install vllm` (Linux) or put llama-server on PATH")
     kw = {"start_new_session": True} if sys.platform != "win32" else {

@@ -198,6 +198,18 @@ def _floor(paths: Paths, model_dir: Path, build: str, language: str, dirs: list[
     return run_eval(paths, "retrieval", split, recipe=model_dir / "recipe.yaml")[split]
 
 
+def _scoring(paths: Paths, meta: dict, reason: str):
+    """The GPU lock for scoring a candidate. A QLoRA model is scored through the running server (``uyari serve
+    start --adapter``): stopping it would leave only in-process inference, which does not fit the 4090."""
+    import contextlib
+
+    from uyari.serve import gpu_session, status
+
+    if meta["kind"] == "causal_lora" and status(paths).get("ready"):
+        return contextlib.nullcontext()
+    return gpu_session(paths, reason)
+
+
 def register_model(paths: Paths, ref: str, slot: str | None = None, score_test: bool = True,
                    force: bool = False, reason: str = "") -> dict:
     """The Trainer's promotion rule for a model trained outside the loop (``make train-nllb``,
@@ -230,7 +242,7 @@ def register_model(paths: Paths, ref: str, slot: str | None = None, score_test: 
     stored = _scores(d)
     cand = stored.get("validation")
     if not cand:
-        with gpu_session(paths, f"register: validation {name}"):
+        with _scoring(paths, meta, f"register: validation {name}"):
             cand = run_eval(paths, ref, "validation")["validation"]
     dirs = [k for k in cand if ">" in k]
     floor = _floor(paths, d, build, lang, dirs, "validation")
@@ -274,7 +286,7 @@ def register_model(paths: Paths, ref: str, slot: str | None = None, score_test: 
     if score_test:
         test = stored.get("test")
         if not test:
-            with gpu_session(paths, f"register: test {name}"):
+            with _scoring(paths, meta, f"register: test {name}"):
                 test = run_eval(paths, ref, "test")["test"]
         _floor(paths, d, build, lang, dirs, "test")
         out["test"] = {k: test[k]["chrf++"] for k in dirs if k in test}

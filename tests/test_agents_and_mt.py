@@ -172,3 +172,56 @@ def test_register_applies_the_trainer_rule(fixture_root, tmp_path, monkeypatch):
     assert r["decision"] == "registered" and cards[-2:] == ["mt-qaa-spa-b@v0.1", "mt-qaa-spa-a@v0.1"]
     last = load(fixture_root)["mt"]["qaa_Latn"]["history"][-1]
     assert last["to"] == "mt-qaa-spa-b@v0.1" and last["reason"].startswith("forced: demo needs it")
+
+
+def test_clean_completion_keeps_the_translation():
+    from uyari.pipelines.mt.train_causal import clean_completion
+
+    assert clean_completion(" to=user<|message|>Yaʼi waʼwaruʼsa.<|eot|>") == "Yaʼi waʼwaruʼsa."
+    # a stray channel marker after the translation must not leave an empty answer
+    assert clean_completion("Yaʼi waʼwaruʼsa aʼchinpeike paʼ<|message|>") == "Yaʼi waʼwaruʼsa aʼchinpeike paʼ"
+    assert clean_completion(" to=user<|message|>Ipiʼ<|message|><|eot|>") == "Ipiʼ"
+    assert clean_completion("<|channel|>analysis<|message|>think<|end|><|start|>assistant<|channel|>final"
+                            "<|message|>Ipiʼ<|eot|>") == "Ipiʼ"
+    assert clean_completion("Ipiʼ\nsecond line") == "Ipiʼ" and clean_completion("<|message|>") == ""
+
+
+def test_into_rotation_keeps_k_sources_per_target_and_every_example_out():
+    from collections import Counter
+
+    from uyari.pipelines.mt.train_causal import into_rotation
+
+    offs = ["spa_Latn", "eng_Latn", "fra_Latn", "deu_Latn", "ita_Latn", "por_Latn"]
+    rows = [{"chunk_id": f"c{c}", "src_lang": o, "tgt_lang": "cbt_Latn", "tgt": f"shawi {c}"} for c in range(30)
+            for o in offs]
+    rows += [{"chunk_id": f"c{c}", "src_lang": "cbt_Latn", "tgt_lang": o, "tgt": f"{o} {c}"} for c in range(30)
+             for o in offs]
+    assert into_rotation(rows, "cbt_Latn", None, 7, 0) == list(range(len(rows)))
+    e0, e1 = into_rotation(rows, "cbt_Latn", 2, 7, 0), into_rotation(rows, "cbt_Latn", 2, 7, 1)
+    for idx in (e0, e1):
+        kept = [rows[i] for i in idx]
+        assert sum(r["tgt_lang"] != "cbt_Latn" for r in kept) == 180  # every direction out of Shawi
+        assert set(Counter(r["chunk_id"] for r in kept if r["tgt_lang"] == "cbt_Latn").values()) == {2}
+    assert e0 == into_rotation(rows, "cbt_Latn", 2, 7, 0) and e0 != e1  # deterministic, rotates per epoch
+    sources = Counter(rows[i]["src_lang"] for e in range(30) for i in into_rotation(rows, "cbt_Latn", 2, 7, e)
+                      if rows[i]["tgt_lang"] == "cbt_Latn")
+    assert set(sources) == set(offs) and max(sources.values()) < 2 * min(sources.values())  # all six, balanced
+
+
+def test_selection_on_into_and_the_subset():
+    from uyari.pipelines.mt.train_causal import selection_metric, selection_rows
+
+    sc = {"spa>cbt": 40.0, "eng>cbt": 42.0, "cbt>spa": 50.0, "cbt>eng": 48.0}
+    assert selection_metric(sc, "cbt_Latn", "into") == {"score": 41.0, "into": 41.0, "out": 49.0, "all": 45.0}
+    assert selection_metric(sc, "cbt_Latn")["score"] == 45.0
+    with pytest.raises(ValueError):
+        selection_metric(sc, "cbt_Latn", "best")
+    rows = [{"id": f"{c}:{d}", "src_lang": d[0], "tgt_lang": d[1]} for c in range(100)
+            for d in [("spa_Latn", "cbt_Latn"), ("eng_Latn", "cbt_Latn"), ("cbt_Latn", "spa_Latn"), ("cbt_Latn", "eng_Latn")]]
+    sub = selection_rows(rows, "cbt_Latn", {"select_into": 30, "select_out": 10}, 7)
+    from collections import Counter
+
+    assert Counter((r["src_lang"], r["tgt_lang"]) for r in sub) == {
+        ("spa_Latn", "cbt_Latn"): 30, ("eng_Latn", "cbt_Latn"): 30, ("cbt_Latn", "spa_Latn"): 10,
+        ("cbt_Latn", "eng_Latn"): 10}
+    assert len(selection_rows(rows, "cbt_Latn", {"select_limit": 40}, 7)) == 40

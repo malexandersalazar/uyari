@@ -122,7 +122,7 @@ def check_download(args) -> dict:
             out[repo] = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
     if not out[args.glimmer_id]["ok"]:
         raise RuntimeError(f"Glimmer download failed: {out[args.glimmer_id]['error']} "
-                           "(check the repo id, `huggingface-cli login`, and the license gate)")
+                           "(it is public and ungated: check the repo id, and whether the repository moved or changed)")
     return out
 
 

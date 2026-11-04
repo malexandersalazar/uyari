@@ -3,7 +3,7 @@
 * ``mms``     facebook/mms-1b-all (transformers, any OS): CTC with a per-language adapter.
 * ``omniasr`` Omnilingual ASR (``pip install omnilingual-asr``, Linux): zero-shot for the
               pilot languages; Shawi is listed but **unmeasured** until recordings exist.
-* ``meta``    Muse Voice Transcribe (Spanish only; costs money; see uyari.speech.transcribe).
+* ``meta``    Muse Voice Transcribe (official languages only; costs money; see uyari.speech.transcribe).
 * ``null``    returns "" (plumbing tests on the synthetic fixture).
 """
 
@@ -14,6 +14,7 @@ from pathlib import Path
 
 MMS = "facebook/mms-1b-all"
 OMNI = "omniASR_LLM_7B"
+META_LANGUAGES = {"spa_Latn": "es", "eng_Latn": "en", "por_Latn": "pt", "fra_Latn": "fr"}  # never Indigenous
 
 
 @cache
@@ -40,7 +41,7 @@ def _load_16k(path: Path):
     return x
 
 
-def infer_file(audio: Path, lang: str, backend: str = "mms") -> str:
+def infer_file(audio: Path, lang: str, backend: str = "mms", assume_yes: bool = False) -> str:
     iso = lang.split("_")[0]
     if backend == "null":
         return ""
@@ -58,10 +59,11 @@ def infer_file(audio: Path, lang: str, backend: str = "mms") -> str:
         pipe = ASRInferencePipeline(model_card=OMNI)
         return pipe.transcribe([str(audio)], lang=[lang], batch_size=1)[0]
     if backend == "meta":
-        if lang != "spa_Latn":
-            raise ValueError("Muse Voice Transcribe is used for Spanish only")
+        if lang not in META_LANGUAGES:
+            raise ValueError(f"Muse Voice Transcribe is used for official languages only ({sorted(META_LANGUAGES)})")
         from uyari.paths import Paths
         from uyari.speech.transcribe import transcribe_file
 
-        return transcribe_file(Paths.default(), Path(audio), assume_yes=False).get("text", "")
+        return transcribe_file(Paths.default(), Path(audio), assume_yes=assume_yes,
+                               language=META_LANGUAGES[lang]).get("text", "")
     raise ValueError(f"unknown backend {backend}")

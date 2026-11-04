@@ -67,13 +67,23 @@ def _files(paths: Paths) -> list[Path]:
         return files
 
 
+def _pattern(tokens: list[str]) -> re.Pattern:
+    return re.compile(r"(?<![\w])(" + "|".join(re.escape(t) for t in tokens) + r")(?![\w])", re.IGNORECASE)
+
+
+def find_names(paths: Paths, text: str) -> list[str] | None:
+    """Private names in a text published outside the repository (a Hugging Face README); None without a list."""
+    tokens, _ = _names(paths)
+    return sorted({m.group(1) for m in _pattern(tokens).finditer(text)}) if tokens else None
+
+
 def run_privacy_check(paths: Paths) -> PrivacyResult:
     tokens, allow = _names(paths)
     res = PrivacyResult()
     if not tokens:
         res.summary = f"skipped: no private name list ({paths.private / 'privacy_names.txt'}) on this machine"
         return res
-    pat = re.compile(r"(?<![\w])(" + "|".join(re.escape(t) for t in tokens) + r")(?![\w])", re.IGNORECASE)
+    pat = _pattern(tokens)
     for f in _files(paths):
         if f.suffix.lower() in BINARY_EXT or any(part in SKIP_DIRS for part in f.relative_to(paths.data).parts):
             continue

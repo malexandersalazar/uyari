@@ -20,6 +20,14 @@ BASE_LICENSES = {
 }
 
 
+SCORED_BY = {  # scores.json records which translator produced the hypotheses
+    "ServerTranslator": "through the model server (`uyari serve`), in the form the demo serves: for Muse Glimmer, "
+                        "Unsloth's 4-bit GGUF with this adapter on llama-server",
+    "CausalTranslator": "in process: the 4-bit base with this adapter (Unsloth or PEFT)",
+    "NllbTranslator": "in process",
+}
+
+
 def base_license(base: str) -> str:
     for k, v in BASE_LICENSES.items():
         if base.startswith(k):
@@ -79,9 +87,9 @@ def write_card(paths: Paths, model_dir: Path, demo_note: str = "") -> Path:
         "",
         (f"Registered as **{', '.join(slot)}** for {meta['language']} in `models/registry.yaml`. " if slot else
          "Not currently registered in `models/registry.yaml`. ") + (demo_note or (
-            "The demo serves Muse Glimmer (open weights, on our own RTX 4090) by default and NLLB as its fast "
-            "mode, whichever scores higher: the project's claim is that it runs on an open-weight Muse model on "
-            "our own hardware. Both scores are on both cards.")),
+            "The demo serves Muse Glimmer (open weights, on our own RTX 4090) by default and NLLB as the second "
+            "choice, which visitors can pick: the project's claim is that it runs on an open-weight Muse model "
+            "on our own hardware. Each card has its own scores; the demo's panel shows both side by side.")),
         "",
         "## License and credit",
         "",
@@ -93,6 +101,8 @@ def write_card(paths: Paths, model_dir: Path, demo_note: str = "") -> Path:
         "returns the human translation of the most similar training sentence; a model that does not beat it "
         "is not worth serving.",
         "",
+        *([f"Scored {SCORED_BY.get(scores['validation'].get('backend'), 'in process')}.", ""]
+          if scores.get("validation") else []),
         "### Validation",
         "",
         "| Direction | chrF++ | BLEU | Retrieval floor chrF++ | Segments |",

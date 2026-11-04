@@ -176,8 +176,11 @@ def translate_one(paths: Paths, text: str, direction: str, ref: str | None = Non
     from uyari.registry import promoted
 
     s, t = direction.split(">")
-    full = {"spa": "spa_Latn", "cbt": "cbt_Latn", "eng": "eng_Latn"}
-    ref = ref or promoted(paths, "mt", full.get(t if s == "spa" else s, "cbt_Latn"))
+    officials = {"spa": "spa_Latn", "eng": "eng_Latn", "fra": "fra_Latn", "deu": "deu_Latn", "ita": "ita_Latn",
+                 "por": "por_Latn"}
+    full = {**officials, "cbt": "cbt_Latn"}
+    lang = full.get(t if s in officials else s, "cbt_Latn")  # the Indigenous side names the registry entry
+    ref = ref or promoted(paths, "mt", lang) or promoted(paths, "mt", lang, "fast")
     if not ref:
-        raise RuntimeError("no model given and none promoted (models/registry.yaml)")
+        raise RuntimeError("no model given and none registered (models/registry.yaml)")
     return _cached(paths, ref).translate([text], full.get(s, s), full.get(t, t))[0]

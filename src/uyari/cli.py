@@ -121,12 +121,18 @@ def build(tag: str = typer.Option(..., help="Build tag, e.g. data-2026.11"),
           as_of: str = typer.Option(None, help="Takedown cut-off date (YYYY-MM-DD); default today."),
           verify: bool = typer.Option(False, help="Recompute and compare against the existing manifest."),
           dry_run: bool = typer.Option(False, help="Compute counts and hashes; write nothing."),
+          officials: str = typer.Option(None, help="Official languages to pair with, comma-separated (e.g. "
+                                                    "spa_Latn,eng_Latn). Default: every folder under primary/."),
           root: Path = ROOT_OPT):
     """Contributions -> builds/<tag>/<lang>/{mt,asr,tts}(.test).parquet + MANIFEST.json."""
     from uyari.build import run_build
 
     d = date.fromisoformat(as_of) if as_of else None
-    res = run_build(_paths(root), tag, as_of=d, verify=verify, dry_run=dry_run)
+    only = [x.strip() for x in officials.split(",") if x.strip()] if officials else None
+    try:
+        res = run_build(_paths(root), tag, as_of=d, verify=verify, dry_run=dry_run, officials=only)
+    except ValueError as e:
+        _fail(str(e))
     res.print(console)
     raise typer.Exit(0 if res.ok else 1)
 
@@ -342,10 +348,12 @@ def serve_status(root: Path = ROOT_OPT):
 
 @app.command()
 def demo(share: bool = typer.Option(True, help="Also open a temporary public gradio.live link."),
-         voice: bool = typer.Option(True, help="Spanish voice input, paid with the visitor's own Meta key."),
+         voice: bool = typer.Option(True, help="Voice input, paid with the visitor's own Meta key."),
          port: int = typer.Option(7860), root: Path = ROOT_OPT):
-    """Gradio page: es<->cbt with our fine-tuned models only (Glimmer default, NLLB fast mode), three closest
-    human pairs; optional Spanish voice with the visitor's own Meta API key (the server's key is never used)."""
+    """Gradio page: Shawi <-> Spanish, English, French, German, Italian and Portuguese (Shawi always on one side)
+    with our fine-tuned models (Glimmer through `uyari serve` by default, NLLB as the second choice), the three
+    closest human pairs, Shawi read aloud by the local MMS voice; optional voice input (Spanish, English, French,
+    Portuguese) with the visitor's own Meta API key (the server's key is never used)."""
     sys.path.insert(0, str(_paths(root).code / "demo"))
     from app import launch  # demo/app.py
 
@@ -388,22 +396,42 @@ def asr_eval(tag: str = typer.Option(...), lang: str = typer.Option(...), backen
 
 @tts_app.command("check-voice")
 def tts_check_voice(iso: str = typer.Argument("cbt"), root: Path = ROOT_OPT):
-    """Does an MMS-TTS voice exist for this language, and does its alphabet cover our text?"""
+    """Does an MMS-TTS voice exist for this language, and does its alphabet cover our accepted text (before and
+    after the spelling converter in languages/<lang>/tts.yaml)?"""
     from uyari.data.languages import list_languages
     from uyari.pipelines.tts.check_voice import accepted_texts, check_voice
+    from uyari.pipelines.tts.voice import load_config
 
     p = _paths(root)
     lang = next((x for x in list_languages(p) if x.startswith(iso + "_")), None)
-    console.print_json(json.dumps(check_voice(iso, accepted_texts(p, lang) if lang else None), ensure_ascii=False))
+    cfg = load_config(p, lang) if lang else None
+    res = check_voice(iso, accepted_texts(p, lang, limit=None) if lang else None, cfg)
+    console.print_json(json.dumps(res, ensure_ascii=False))
+    if "letter_coverage" in res:
+        def left(m):
+            return ", ".join(f"{c} {n}" for c, n in m.items()) or "none"
+        before = res.get("before_conversion")
+        if before:
+            console.print(f"{res['repo']}: {before['letter_coverage']:.2%} of {before['letters']:,} letters as written "
+                          f"(cannot read: {left(before['missing_letters'])}); {res['letter_coverage']:.2%} after "
+                          f"{res['converter']} (cannot read: {left(res['missing_letters'])}).")
+        else:
+            console.print(f"{res['repo']}: {res['letter_coverage']:.2%} of {res['letters']:,} letters "
+                          f"(cannot read: {left(res['missing_letters'])}).")
+        color = "green" if res["usable"] else "red"
+        console.print(f"[{color}]{'usable' if res['usable'] else 'not usable'}[/{color}]")
 
 
 @app.command()
 def s2s(audio: Path, src: str = typer.Option("spa_Latn"), tgt: str = typer.Option("cbt_Latn"),
-        model: str = typer.Option(None), out: Path = typer.Option(None), root: Path = ROOT_OPT):
-    """Speech -> text -> translation -> speech (text output when no voice exists)."""
+        model: str = typer.Option(None), out: Path = typer.Option(None),
+        yes: bool = typer.Option(False, "--yes", help="Do not ask before the paid transcription."),
+        root: Path = ROOT_OPT):
+    """Speech -> text -> translation -> speech (Shawi through the MMS voice and its spelling converter; text
+    output when no usable voice exists)."""
     from uyari.pipelines.s2s.chain import run_chain
 
-    console.print_json(json.dumps(run_chain(_paths(root), audio, src, tgt, model=model, out=out),
+    console.print_json(json.dumps(run_chain(_paths(root), audio, src, tgt, model=model, out=out, assume_yes=yes),
                                   ensure_ascii=False))
 
 
@@ -420,6 +448,26 @@ def privacy_check(root: Path = ROOT_OPT):
     raise typer.Exit(0 if res.ok else 1)
 
 
+# ------------------------------------------------------------------------------- publish
+@app.command("publish")
+def publish(model: str = typer.Option(..., help="models/<name>@vX.Y"),
+            namespace: str = typer.Option(None, help="Hugging Face user or organization (default: HF_TOKEN's user)."),
+            private: bool = typer.Option(True, "--private/--public", help="Visibility when the repository is created; "
+                                                                           "an existing repository keeps its own."),
+            dry_run: bool = typer.Option(False, "--dry-run", help="Write runs/hub/<repo>/README.md and list the "
+                                                                    "files; upload nothing."),
+            root: Path = ROOT_OPT):
+    """Publish a model to Hugging Face: weights or adapter, and a README generated from its card, scores and
+    build (usage, test scores, license, limitations; the rest is linked to GitHub). One commit, tagged vX.Y."""
+    from uyari.pipelines.mt.hub import publish as run_publish
+
+    res = run_publish(_paths(root), model, namespace=namespace, private=private, dry_run=dry_run)
+    if res["links_not_on_origin_main"]:
+        console.print("[yellow]README links that resolve only after a push to origin/main:[/yellow] "
+                      + ", ".join(res["links_not_on_origin_main"]))
+    console.print_json(json.dumps(res, ensure_ascii=False))
+
+
 @primary_app.command("translate")
 def primary_translate(batch: str = typer.Option(..., help="Output batch id, e.g. 2026-11_musespark13c_0001"),
                       source: str = typer.Option("spa_Latn"), target: str = typer.Option("eng_Latn"),
@@ -427,6 +475,8 @@ def primary_translate(batch: str = typer.Option(..., help="Output batch id, e.g.
                       only_translated_in: str = typer.Option(None, help="Only chunks already translated into this "
                                                                          "language (e.g. cbt_Latn)."),
                       limit: int = typer.Option(None, help="First N chunks only (a canary)."),
+                      source_batch: str = typer.Option(None, help="Only chunks whose source_batch_id is this "
+                                                                    "(e.g. a new generation batch)."),
                       per_request: int = typer.Option(20), concurrency: int = typer.Option(8),
                       estimate: bool = typer.Option(False, help="Cost table only, no network."),
                       max_usd: float = typer.Option(None), yes: bool = typer.Option(False, "--yes"),
@@ -435,7 +485,7 @@ def primary_translate(batch: str = typer.Option(..., help="Output batch id, e.g.
     from uyari.gen.translate_primary import run_translate
 
     res = run_translate(_paths(root), batch, source, target, model, only_translated_in, limit, per_request,
-                        estimate, max_usd, yes, concurrency, console=console)
+                        estimate, max_usd, yes, concurrency, console=console, source_batch=source_batch)
     if not estimate:
         console.print_json(json.dumps(res, ensure_ascii=False))
 

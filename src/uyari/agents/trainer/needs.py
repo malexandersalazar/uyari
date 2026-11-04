@@ -31,13 +31,22 @@ def needs_items(paths: Paths, lang: str, tag: str | None = None) -> tuple[list[s
                      "about one hour of read clips from one speaker.")
     try:
         from uyari.pipelines.tts.check_voice import accepted_texts, check_voice
+        from uyari.pipelines.tts.voice import load_config
 
-        v = check_voice(L.iso, accepted_texts(paths, lang))
+        cfg = load_config(paths, lang)
+        v = check_voice(L.iso, accepted_texts(paths, lang, limit=None), cfg)
         if v.get("exists") and v.get("usable") is False:
             miss = ", ".join(list(v["missing_letters"])[:4])
             items.append(f"**A voice in our orthography.** `{v['repo']}` exists (Bible recordings, {v.get('license')}) "
-                         f"but covers {v['letter_coverage']:.0%} of the letters in our text (no {miss}): it needs an "
-                         "orthography converter written with the steward, or a voice trained on our own recordings.")
+                         f"but covers {v['letter_coverage']:.0%} of the letters in our text (no {miss}): it needs a "
+                         f"spelling converter (`languages/{lang}/tts.yaml`) written with the steward, or a voice "
+                         "trained on our own recordings.")
+        elif v.get("exists") and v.get("before_conversion"):
+            items.append(f"**Our own voice.** `{v['repo']}` (Bible recordings, {v.get('license')}) reads our text "
+                         f"through a spelling converter (`{v['converter']}`): "
+                         f"{v['before_conversion']['letter_coverage']:.0%} of the letters as written, "
+                         f"{v['letter_coverage']:.2%} after. A voice of our own, in our spelling, comes from the read "
+                         "recordings above.")
     except Exception:  # noqa: BLE001 - offline: skip the voice line
         pass
     pc = load_primary(paths, L.primary)

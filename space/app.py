@@ -14,7 +14,7 @@ import gradio as gr
 import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-MODEL_REPO = os.environ.get("UYARI_MODEL_REPO", "uyari/mt-cbt-spa-nllb1.3b")
+MODEL_REPO = os.environ.get("UYARI_MODEL_REPO", "malexandersalazar/uyari-mt-cbt-nllb1.3b")
 CODEC = {"ʼ": "'"}  # NLLB's SentencePiece has no U+02BC; mapped at the edges only
 tok = AutoTokenizer.from_pretrained(MODEL_REPO)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_REPO, dtype=torch.float32).eval()

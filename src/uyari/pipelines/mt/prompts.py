@@ -7,6 +7,8 @@ LANG_NAMES = {
     "eng_Latn": "English",
     "por_Latn": "Portuguese",
     "fra_Latn": "French",
+    "deu_Latn": "German",
+    "ita_Latn": "Italian",
     "cbt_Latn": "Shawi (Chayahuita)",
     "quy_Latn": "Ayacucho Quechua",
     "quz_Latn": "Cusco Quechua",

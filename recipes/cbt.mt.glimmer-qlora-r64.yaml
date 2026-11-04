@@ -1,0 +1,52 @@
+# Muse Glimmer 30B, QLoRA (4-bit) with Unsloth: one model for Shawi <-> six official languages (12
+# directions), the headline model. Every official side but the Spanish is machine-translated from it; every
+# Shawi sentence is human. Trained on a Modal H100 80 GB (scripts/modal_glimmer.py): the 4-bit model does not
+# fit the 4090 for training.
+# v0.2 (all 12 directions every epoch, chosen by the mean over directions) was ~5 chrF++ below NLLB into
+# Shawi: each Shawi target came from six sources per epoch and was memorized six times faster than the
+# directions out of Shawi (into-Shawi peaked at half an epoch). So each epoch here takes every Shawi target
+# from only 2 of its 6 sources (rotating), keeps every direction out of Shawi, and the checkpoint is chosen
+# by greedy chrF++ into Shawi (80 validation sentences per direction; 20 per direction out, logged).
+# LoRA rank 64 (alpha 64) instead of 16, for more room to learn to write Shawi: the served model (v0.4).
+# On the 480 into-Shawi selection sentences, chrF++ greedy: rank 16 (v0.3) 41.97 at 2 epochs (stopped);
+# rank 64 (v0.4) 43.6 at one epoch (kept), NLLB v0.3 43.6 greedy and 44.2 with beam 4. Two follow-ups did
+# not beat it and were not registered: the same recipe with the schedule ending at 1.25 epochs (v0.5,
+# 43.56) and rank 128 (v0.6, 42.61). Served as a 4-bit GGUF it scores 42.9 there (0.7 lower).
+id: cbt.mt.glimmer-qlora-r64
+build: data-2026.11-six
+task: mt
+language: cbt_Latn
+primaries: [spa_Latn, eng_Latn, fra_Latn, deu_Latn, ita_Latn, por_Latn]
+directions: [spa>cbt, cbt>spa, eng>cbt, cbt>eng, fra>cbt, cbt>fra, deu>cbt, cbt>deu, ita>cbt, cbt>ita, por>cbt, cbt>por]
+splits: {train: train, validation: validation}
+filters: {provenance: [human], licenses: [cc-by-4.0]}
+base_model: meta-models/Muse-Glimmer-30B     # verify with scripts/check_4090.py
+method: qlora
+# Glimmer is image-text-to-text (MuseGlimmerForConditionalGeneration): LoRA on the language layers,
+# vision frozen (Unsloth FastModel). Its ATEM chat template defaults to "Reasoning strength: high";
+# translation answers directly. The same kwargs apply at training, in-process inference and on the
+# server (vLLM `chat_template_kwargs`).
+chat_template_kwargs: {reasoning_strength: low}
+lora: {r: 64, alpha: 64, dropout: 0.0, target: all-linear, backend: unsloth}
+train:
+  epochs: 3
+  into_sources_per_target: 2                     # of 6; the directions out of Shawi keep all
+  lr: 1.0e-4
+  precision: bf16
+  batch_size: 8                                   # x2 accumulation = 16 per step, as on the 4090 (1 x 16);
+  grad_accum: 2                                   # trained on a Modal H100 80 GB: the 4-bit model does not fit 24 GB
+  max_len: 512
+  warmup_ratio: 0.03
+  seed: 7
+  optimizer: adamw_8bit
+eval:
+  max_new_tokens: 256
+  batch_size: 8
+  server_adapter: mt-cbt                      # name when served by `uyari serve start`
+  selection: chrf                             # greedy chrF++
+  select_on: into                             # the directions into Shawi
+  select_into: 80                             # validation sentences per direction into Shawi
+  select_out: 20                              # and out of it (logged, not used)
+  select_every: 0.5                           # epochs; and at the end
+  select_batch_size: 64
+output: models/mt-cbt-glimmer30b-qlora@v0.4

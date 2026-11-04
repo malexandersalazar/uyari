@@ -20,6 +20,7 @@ dependencies = [
   "tiktoken>=0.7",
   "sacrebleu>=2.4",
   "scikit-learn>=1.4",
+  "modal>=1.6.3",
 ]
 
 [project.urls]
