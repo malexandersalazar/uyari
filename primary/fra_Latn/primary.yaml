@@ -1,0 +1,58 @@
+# The French primary corpus: machine-translated from the Spanish one, same chunk ids.
+id: fra_Latn
+display_name: Français
+batches:
+  - id: 2026-11_musespark13c_0001
+    file: chunks/translated/2026-11_musespark13c_0001.csv
+    origin: machine_translated
+    source: spa_Latn batches 2026-06_opus48_0001 and 2026-11_musespark13c_0001 (11,977 chunks)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      11,977 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.2116 (ledger). Written by uyari primary translate, November 2026.
+  - id: 2026-11_musespark13c_0002
+    file: chunks/translated/2026-11_musespark13c_0002.csv
+    origin: machine_translated
+    source: spa_Latn batch 2026-11_musespark13c_0002 (--source-batch 2026-11_musespark13c_0002)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      9,972 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.1745 (ledger). Written by uyari primary translate, November 2026.
+  - id: 2026-11_musespark13c_0003
+    file: chunks/translated/2026-11_musespark13c_0003.csv
+    origin: machine_translated
+    source: spa_Latn batch 2026-11_musespark13c_0003 (--source-batch 2026-11_musespark13c_0003)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      22,374 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.3934 (ledger). Written by uyari primary translate, November 2026.
+  - id: 2026-11_musespark13c_0004
+    file: chunks/translated/2026-11_musespark13c_0004.csv
+    origin: machine_translated
+    source: spa_Latn batch 2026-11_musespark13c_0004 (--source-batch 2026-11_musespark13c_0004)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      22,388 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.4013 (ledger). Written by uyari primary translate, November 2026.
+  - id: 2026-11_musespark13c_0005
+    file: chunks/translated/2026-11_musespark13c_0005.csv
+    origin: machine_translated
+    source: spa_Latn batch 2026-11_musespark13c_0005 (--source-batch 2026-11_musespark13c_0005)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      22,354 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.3902 (ledger). Written by uyari primary translate, November 2026.
+  - id: 2026-11_musespark13c_0006
+    file: chunks/translated/2026-11_musespark13c_0006.csv
+    origin: machine_translated
+    source: spa_Latn batch 2026-11_musespark13c_0006 (--source-batch 2026-11_musespark13c_0006)
+    gen_model: muse-spark-1.3-contributor
+    provider: meta (Responses API)
+    notes: >-
+      22,298 chunks, 20 per request, none left out. Prompt version tv-764b3142c61e.
+      Cost USD 0.3994 (ledger). Written by uyari primary translate, November 2026.

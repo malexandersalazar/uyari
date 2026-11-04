@@ -4,6 +4,9 @@
 |---|---|---|---|
 | `2026-06_opus48_0001` | 10,000 | Claude Opus 4.8 (Message Batches), June 2026 | First batch: 4 of the matrix's 15 domains, 37 micro-scenarios; 3,575 have Shawi translations |
 | `2026-11_musespark13c_0001` | 1,977 | **Muse Spark 1.3 Contributor** (Meta Model API) | Same 200 cells, same prompt (`prompt_version` pv-337a163d411a); groups carry `regen_of` and inherit its split |
+| `2026-11_musespark13c_0002` | 9,972 | Muse Spark 1.3 Contributor | New cells from the full matrix (15 domains); pilot of the 100K run |
+| `2026-11_musespark13c_0003` to `_0006` | 89,414 | Muse Spark 1.3 Contributor | 4 × 22,500 requested; 0.4–0.9% near-duplicates removed per batch |
+| **Total** | **111,363** | | Every chunk is also in English, Portuguese, French, German, Italian, Hindi and Thai (same ids) |
 
 ## Why generation moved to Meta
 

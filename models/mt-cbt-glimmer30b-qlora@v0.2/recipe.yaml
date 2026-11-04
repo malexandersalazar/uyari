@@ -1,0 +1,41 @@
+# Muse Glimmer 30B, QLoRA (4-bit) with Unsloth: one model for Shawi <-> six official languages (12
+# directions), the headline model. Every official side but the Spanish is machine-translated from it; every
+# Shawi sentence is human. Trained on a Modal H100 80 GB (scripts/modal_glimmer.py): the 4-bit model does not
+# fit the 4090 for training. Selection by greedy chrF++ on a fixed validation subset every half epoch: v0.1
+# (4 directions), chosen by validation loss, stopped after one epoch 4-5 points below NLLB into Shawi. Each
+# epoch shows every Shawi sentence six times as a target, so 2 epochs with four selection points.
+id: cbt.mt.glimmer-qlora
+build: data-2026.11-six
+task: mt
+language: cbt_Latn
+primaries: [spa_Latn, eng_Latn, fra_Latn, deu_Latn, ita_Latn, por_Latn]
+directions: [spa>cbt, cbt>spa, eng>cbt, cbt>eng, fra>cbt, cbt>fra, deu>cbt, cbt>deu, ita>cbt, cbt>ita, por>cbt, cbt>por]
+splits: {train: train, validation: validation}
+filters: {provenance: [human], licenses: [cc-by-4.0]}
+base_model: meta-models/Muse-Glimmer-30B     # verify with scripts/check_4090.py
+method: qlora
+# Glimmer is image-text-to-text (MuseGlimmerForConditionalGeneration): LoRA on the language layers,
+# vision frozen (Unsloth FastModel). Its ATEM chat template defaults to "Reasoning strength: high";
+# translation answers directly. The same kwargs apply at training, in-process inference and on the
+# server (vLLM `chat_template_kwargs`).
+chat_template_kwargs: {reasoning_strength: low}
+lora: {r: 16, alpha: 32, dropout: 0.0, target: all-linear, backend: unsloth}
+train:
+  epochs: 2
+  lr: 1.0e-4
+  precision: bf16
+  batch_size: 8                                   # x2 accumulation = 16 per step, as on the 4090 (1 x 16);
+  grad_accum: 2                                   # trained on a Modal H100 80 GB: the 4-bit model does not fit 24 GB
+  max_len: 512
+  warmup_ratio: 0.03
+  seed: 7
+  optimizer: adamw_8bit
+eval:
+  max_new_tokens: 256
+  batch_size: 8
+  server_adapter: mt-cbt                      # name when served by `uyari serve start`
+  selection: chrf                             # greedy chrF++, mean over directions
+  select_limit: 480                           # 40 validation sentences per direction
+  select_every: 0.5                           # epochs; and at the end
+  select_batch_size: 32
+output: models/mt-cbt-glimmer30b-qlora@v0.2

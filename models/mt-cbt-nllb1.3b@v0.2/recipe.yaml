@@ -1,0 +1,31 @@
+# NLLB-200 1.3B, full fine-tune, one model for Shawi <-> Spanish and Shawi <-> English (4 directions).
+# The English side is machine-translated from the Spanish (primary/eng_Latn, origin=machine_translated);
+# every Shawi sentence is human. NLLB already knows eng_Latn and spa_Latn; cbt_Latn is added.
+# 4090: about twice the examples of the Spanish-only recipe; 5,856 steps at about 0.25-0.3 s each.
+id: cbt.mt.nllb-1.3b
+build: data-2026.11
+task: mt
+language: cbt_Latn
+primaries: [spa_Latn, eng_Latn]
+directions: [spa>cbt, cbt>spa, eng>cbt, cbt>eng]
+splits: {train: train, validation: validation}     # test only via `uyari eval --final`
+filters: {provenance: [human], licenses: [cc-by-4.0]}
+base_model: facebook/nllb-200-distilled-1.3B
+method: seq2seq
+new_lang_token_init: quy_Latn                      # cbt_Latn embedding starts from Ayacucho Quechua
+text_codec: {"ʼ": "'"}                             # NLLB's SentencePiece maps U+02BC to <unk>; reversed on output
+train:
+  epochs: 8
+  lr: 1.0e-4
+  optimizer: adafactor
+  precision: bf16_mixed
+  batch_size: 8                                   # x2 accumulation = 16 per step; 16 at once runs out of memory on 24 GB
+  grad_accum: 2
+  max_len: 256
+  warmup_ratio: 0.05
+  seed: 7
+eval:
+  num_beams: 4
+  max_new_tokens: 256
+  batch_size: 32
+output: models/mt-cbt-nllb1.3b@v0.2

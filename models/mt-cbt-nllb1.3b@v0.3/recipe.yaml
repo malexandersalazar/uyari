@@ -1,0 +1,34 @@
+# NLLB-200 1.3B, full fine-tune, one model for Shawi <-> six official languages (12 directions): Spanish,
+# English, French, German, Italian, Portuguese. Every official side but the Spanish is machine-translated
+# from it (primary/<lang>, origin=machine_translated); every Shawi sentence is human, and the same 2,925 train
+# sentences pair with all six. NLLB already knows the six; cbt_Latn is added.
+# 4090: three times the examples of v0.2 (4 directions), and each epoch shows every Shawi sentence six times
+# as a target, so 4 epochs instead of 8: 8,776 steps at about 0.3 s each.
+id: cbt.mt.nllb-1.3b
+build: data-2026.11-six
+task: mt
+language: cbt_Latn
+primaries: [spa_Latn, eng_Latn, fra_Latn, deu_Latn, ita_Latn, por_Latn]
+directions: [spa>cbt, cbt>spa, eng>cbt, cbt>eng, fra>cbt, cbt>fra, deu>cbt, cbt>deu, ita>cbt, cbt>ita, por>cbt, cbt>por]
+splits: {train: train, validation: validation}     # test only via `uyari eval --final`
+filters: {provenance: [human], licenses: [cc-by-4.0]}
+base_model: facebook/nllb-200-distilled-1.3B
+method: seq2seq
+new_lang_token_init: quy_Latn                      # cbt_Latn embedding starts from Ayacucho Quechua
+text_codec: {"ʼ": "'"}                             # NLLB's SentencePiece maps U+02BC to <unk>; reversed on output
+train:
+  epochs: 4
+  lr: 1.0e-4
+  optimizer: adafactor
+  precision: bf16_mixed
+  batch_size: 8                                   # x2 accumulation = 16 per step; 16 at once runs out of memory on 24 GB
+  grad_accum: 2
+  max_len: 256
+  warmup_ratio: 0.05
+  seed: 7
+eval:
+  num_beams: 4
+  max_new_tokens: 256
+  batch_size: 32
+  select_limit: 480                               # chrF++ selection each epoch: 40 per direction
+output: models/mt-cbt-nllb1.3b@v0.3

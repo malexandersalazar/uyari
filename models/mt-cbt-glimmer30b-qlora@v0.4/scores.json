@@ -1,0 +1,662 @@
+{
+  "test": {
+    "backend": "ServerTranslator",
+    "cbt>deu": {
+      "bleu": 19.87,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 22.91,
+          "chrf++": 45.75,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 17.58,
+          "chrf++": 41.36,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 14.52,
+          "chrf++": 33.74,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 20.21,
+          "chrf++": 44.24,
+          "n": 100
+        }
+      },
+      "chrf++": 43.36,
+      "n": 322
+    },
+    "cbt>eng": {
+      "bleu": 24.44,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 26.92,
+          "chrf++": 48.1,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 21.12,
+          "chrf++": 41.33,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 11.61,
+          "chrf++": 37.48,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 26.7,
+          "chrf++": 46.57,
+          "n": 100
+        }
+      },
+      "chrf++": 44.86,
+      "n": 322
+    },
+    "cbt>fra": {
+      "bleu": 22.47,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 23.39,
+          "chrf++": 46.07,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 20.55,
+          "chrf++": 42.79,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 19.22,
+          "chrf++": 43.87,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 24.26,
+          "chrf++": 46.53,
+          "n": 100
+        }
+      },
+      "chrf++": 44.88,
+      "n": 322
+    },
+    "cbt>ita": {
+      "bleu": 20.62,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 23.25,
+          "chrf++": 46.34,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 16.85,
+          "chrf++": 40.02,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 17.01,
+          "chrf++": 36.4,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 23.16,
+          "chrf++": 46.55,
+          "n": 100
+        }
+      },
+      "chrf++": 43.76,
+      "n": 322
+    },
+    "cbt>por": {
+      "bleu": 18.57,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 18.77,
+          "chrf++": 43.47,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 15.48,
+          "chrf++": 38.73,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 16.45,
+          "chrf++": 35.6,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 22.17,
+          "chrf++": 44.91,
+          "n": 100
+        }
+      },
+      "chrf++": 41.92,
+      "n": 322
+    },
+    "cbt>spa": {
+      "bleu": 22.61,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 23.79,
+          "chrf++": 46.7,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 18.35,
+          "chrf++": 40.38,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 14.64,
+          "chrf++": 34.39,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 27.04,
+          "chrf++": 47.89,
+          "n": 100
+        }
+      },
+      "chrf++": 44.42,
+      "n": 322
+    },
+    "deu>cbt": {
+      "bleu": 5.47,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.05,
+          "chrf++": 41.45,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 4.62,
+          "chrf++": 40.07,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 3.43,
+          "chrf++": 35.09,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 5.88,
+          "chrf++": 41.74,
+          "n": 100
+        }
+      },
+      "chrf++": 40.92,
+      "n": 322
+    },
+    "eng>cbt": {
+      "bleu": 5.52,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 5.63,
+          "chrf++": 41.36,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 5.03,
+          "chrf++": 39.88,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 4.2,
+          "chrf++": 34.14,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 5.97,
+          "chrf++": 41.92,
+          "n": 100
+        }
+      },
+      "chrf++": 40.87,
+      "n": 322
+    },
+    "fra>cbt": {
+      "bleu": 5.19,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 4.99,
+          "chrf++": 40.27,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 3.84,
+          "chrf++": 37.56,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 1.61,
+          "chrf++": 29.68,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.15,
+          "chrf++": 43.05,
+          "n": 100
+        }
+      },
+      "chrf++": 39.89,
+      "n": 322
+    },
+    "ita>cbt": {
+      "bleu": 5.65,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 5.48,
+          "chrf++": 41.54,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 4.95,
+          "chrf++": 39.57,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 3.97,
+          "chrf++": 37.31,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 6.64,
+          "chrf++": 42.85,
+          "n": 100
+        }
+      },
+      "chrf++": 41.12,
+      "n": 322
+    },
+    "limit": null,
+    "mean_chrf++": 42.42,
+    "por>cbt": {
+      "bleu": 6.45,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 7.4,
+          "chrf++": 43.21,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 5.19,
+          "chrf++": 39.15,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 2.33,
+          "chrf++": 30.93,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.33,
+          "chrf++": 42.9,
+          "n": 100
+        }
+      },
+      "chrf++": 41.31,
+      "n": 322
+    },
+    "scored_at": "2026-11-04T01:44:27+00:00",
+    "spa>cbt": {
+      "bleu": 6.02,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 5.86,
+          "chrf++": 41.43,
+          "n": 99
+        },
+        "emociones_relaciones": {
+          "bleu": 5.65,
+          "chrf++": 41.25,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 4.96,
+          "chrf++": 35.82,
+          "n": 13
+        },
+        "viaje_desplazamiento": {
+          "bleu": 6.67,
+          "chrf++": 42.81,
+          "n": 100
+        }
+      },
+      "chrf++": 41.7,
+      "n": 322
+    }
+  },
+  "validation": {
+    "backend": "ServerTranslator",
+    "cbt>deu": {
+      "bleu": 19.76,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 15.94,
+          "chrf++": 41.18,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 17.9,
+          "chrf++": 42.5,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 11.14,
+          "chrf++": 36.19,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 24.46,
+          "chrf++": 47.64,
+          "n": 97
+        }
+      },
+      "chrf++": 43.86,
+      "n": 328
+    },
+    "cbt>eng": {
+      "bleu": 25.36,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 21.81,
+          "chrf++": 44.61,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 24.18,
+          "chrf++": 44.89,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 10.92,
+          "chrf++": 32.89,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 29.78,
+          "chrf++": 50.77,
+          "n": 97
+        }
+      },
+      "chrf++": 46.64,
+      "n": 328
+    },
+    "cbt>fra": {
+      "bleu": 23.8,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 20.23,
+          "chrf++": 43.92,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 22.03,
+          "chrf++": 44.93,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 10.06,
+          "chrf++": 32.63,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 28.5,
+          "chrf++": 50.12,
+          "n": 97
+        }
+      },
+      "chrf++": 46.25,
+      "n": 328
+    },
+    "cbt>ita": {
+      "bleu": 20.73,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 18.68,
+          "chrf++": 43.02,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 19.24,
+          "chrf++": 43.01,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 8.8,
+          "chrf++": 31.71,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 24.18,
+          "chrf++": 47.84,
+          "n": 97
+        }
+      },
+      "chrf++": 44.46,
+      "n": 328
+    },
+    "cbt>por": {
+      "bleu": 20.14,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 18.39,
+          "chrf++": 44.7,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 17.1,
+          "chrf++": 40.77,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 7.34,
+          "chrf++": 26.38,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 24.64,
+          "chrf++": 48.23,
+          "n": 97
+        }
+      },
+      "chrf++": 44.26,
+      "n": 328
+    },
+    "cbt>spa": {
+      "bleu": 22.66,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 20.63,
+          "chrf++": 45.33,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 19.44,
+          "chrf++": 42.92,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 10.52,
+          "chrf++": 33.31,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 27.37,
+          "chrf++": 49.73,
+          "n": 97
+        }
+      },
+      "chrf++": 45.87,
+      "n": 328
+    },
+    "deu>cbt": {
+      "bleu": 6.32,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 5.5,
+          "chrf++": 40.01,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 5.62,
+          "chrf++": 39.6,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 2.07,
+          "chrf++": 31.07,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.77,
+          "chrf++": 44.03,
+          "n": 97
+        }
+      },
+      "chrf++": 41.13,
+      "n": 328
+    },
+    "eng>cbt": {
+      "bleu": 6.16,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.42,
+          "chrf++": 41.21,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 5.12,
+          "chrf++": 39.8,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 1.14,
+          "chrf++": 31.37,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.02,
+          "chrf++": 42.71,
+          "n": 97
+        }
+      },
+      "chrf++": 41.07,
+      "n": 328
+    },
+    "fra>cbt": {
+      "bleu": 5.8,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.08,
+          "chrf++": 41.77,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 4.25,
+          "chrf++": 37.89,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 2.62,
+          "chrf++": 32.89,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.2,
+          "chrf++": 44.34,
+          "n": 97
+        }
+      },
+      "chrf++": 41.24,
+      "n": 328
+    },
+    "ita>cbt": {
+      "bleu": 6.53,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.02,
+          "chrf++": 41.44,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 5.26,
+          "chrf++": 40.21,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 0.92,
+          "chrf++": 29.97,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 8.26,
+          "chrf++": 45.07,
+          "n": 97
+        }
+      },
+      "chrf++": 42.09,
+      "n": 328
+    },
+    "limit": null,
+    "mean_chrf++": 43.46,
+    "por>cbt": {
+      "bleu": 6.47,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.84,
+          "chrf++": 42.12,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 5.32,
+          "chrf++": 40.38,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 1.11,
+          "chrf++": 30.52,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 7.42,
+          "chrf++": 44.42,
+          "n": 97
+        }
+      },
+      "chrf++": 42.13,
+      "n": 328
+    },
+    "scored_at": "2026-11-04T01:09:27+00:00",
+    "spa>cbt": {
+      "bleu": 6.89,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 6.57,
+          "chrf++": 42.34,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 5.67,
+          "chrf++": 40.52,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 0.98,
+          "chrf++": 30.54,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 8.43,
+          "chrf++": 45.13,
+          "n": 97
+        }
+      },
+      "chrf++": 42.5,
+      "n": 328
+    }
+  }
+}

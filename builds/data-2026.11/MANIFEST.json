@@ -1,7 +1,7 @@
 {
   "as_of": "2026-11-02",
   "git": {
-    "commit": "43782d72bf2ecee061ea4330ff166ea25d551c8c",
+    "commit": "7caf55dd9f021630fe254ed5c40493ca2be21303",
     "dirty": true
   },
   "languages": {
@@ -60,6 +60,10 @@
       "licenses": {
         "cc-by-4.0": 7150
       },
+      "officials": [
+        "eng_Latn",
+        "spa_Latn"
+      ],
       "primary": "spa_Latn",
       "rows_excluded": {
         "empty_translation": 3

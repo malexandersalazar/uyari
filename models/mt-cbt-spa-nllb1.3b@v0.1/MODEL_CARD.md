@@ -4,7 +4,7 @@ Text-to-text translation between **spa_Latn** and **cbt_Latn** (Shawi), both dir
 
 ## Served by the demo
 
-Registered as **fast** for cbt_Latn in `models/registry.yaml`. It is the demo's fast mode and the model for the public Hugging Face Space. The demo default is Muse Glimmer (open weights, on our own RTX 4090) once trained, whichever scores higher: the project claim is an open-weight Muse model on our own hardware. Trained on an RTX 3060 (12 GB) in pure bf16, recipe cbt-spa.mt.nllb-1.3b-3060.
+Not currently registered in `models/registry.yaml`. The demo serves Muse Glimmer (open weights, on our own RTX 4090) by default and NLLB as its fast mode, whichever scores higher: the project's claim is that it runs on an open-weight Muse model on our own hardware. Both scores are on both cards.
 
 ## License and credit
 

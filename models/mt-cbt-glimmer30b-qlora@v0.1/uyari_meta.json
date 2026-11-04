@@ -1,0 +1,36 @@
+{
+  "adapter": "adapter",
+  "backend": "unsloth",
+  "base_model": "meta-models/Muse-Glimmer-30B",
+  "best_epoch": 0,
+  "build": "data-2026.11",
+  "chat_template_kwargs": {
+    "reasoning_strength": "low"
+  },
+  "codec": {},
+  "directions": [
+    "spa_Latn>cbt_Latn",
+    "cbt_Latn>spa_Latn",
+    "eng_Latn>cbt_Latn",
+    "cbt_Latn>eng_Latn"
+  ],
+  "eval": {
+    "batch_size": 8,
+    "max_new_tokens": 256,
+    "server_adapter": "mt-cbt"
+  },
+  "kind": "causal_lora",
+  "language": "cbt_Latn",
+  "method": "qlora",
+  "name": "mt-cbt-glimmer30b-qlora@v0.1",
+  "primaries": [
+    "spa_Latn",
+    "eng_Latn"
+  ],
+  "primary": "spa_Latn",
+  "recipe_file": "cbt.mt.glimmer-qlora.yaml",
+  "recipe_id": "cbt.mt.glimmer-qlora",
+  "selection_val_loss": 1.3961,
+  "steps": 732,
+  "trained_at": "2026-11-03T19:40:13+00:00"
+}

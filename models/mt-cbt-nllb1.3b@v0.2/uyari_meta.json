@@ -1,0 +1,39 @@
+{
+  "added_tokens": [
+    "cbt_Latn"
+  ],
+  "base_model": "facebook/nllb-200-distilled-1.3B",
+  "best_epoch": 6,
+  "build": "data-2026.11",
+  "chat_template_kwargs": {},
+  "codec": {
+    "ʼ": "'"
+  },
+  "directions": [
+    "spa_Latn>cbt_Latn",
+    "cbt_Latn>spa_Latn",
+    "eng_Latn>cbt_Latn",
+    "cbt_Latn>eng_Latn"
+  ],
+  "eval": {
+    "batch_size": 32,
+    "max_new_tokens": 256,
+    "num_beams": 4
+  },
+  "kind": "nllb",
+  "language": "cbt_Latn",
+  "method": "seq2seq",
+  "name": "mt-cbt-nllb1.3b@v0.2",
+  "primaries": [
+    "spa_Latn",
+    "eng_Latn"
+  ],
+  "primary": "spa_Latn",
+  "recipe_file": "cbt.mt.nllb-1.3b.yaml",
+  "recipe_id": "cbt.mt.nllb-1.3b",
+  "selection_chrf_greedy": 47.08,
+  "selection_examples": 200,
+  "steps": 5124,
+  "trained_at": "2026-11-03T15:40:38+00:00",
+  "weights": "weights"
+}

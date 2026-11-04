@@ -1,0 +1,52 @@
+{
+  "added_tokens": [
+    "cbt_Latn"
+  ],
+  "base_model": "facebook/nllb-200-distilled-1.3B",
+  "best_epoch": 2,
+  "build": "data-2026.11-six",
+  "chat_template_kwargs": {},
+  "codec": {
+    "ʼ": "'"
+  },
+  "directions": [
+    "spa_Latn>cbt_Latn",
+    "cbt_Latn>spa_Latn",
+    "eng_Latn>cbt_Latn",
+    "cbt_Latn>eng_Latn",
+    "fra_Latn>cbt_Latn",
+    "cbt_Latn>fra_Latn",
+    "deu_Latn>cbt_Latn",
+    "cbt_Latn>deu_Latn",
+    "ita_Latn>cbt_Latn",
+    "cbt_Latn>ita_Latn",
+    "por_Latn>cbt_Latn",
+    "cbt_Latn>por_Latn"
+  ],
+  "eval": {
+    "batch_size": 32,
+    "max_new_tokens": 256,
+    "num_beams": 4,
+    "select_limit": 480
+  },
+  "kind": "nllb",
+  "language": "cbt_Latn",
+  "method": "seq2seq",
+  "name": "mt-cbt-nllb1.3b@v0.3",
+  "primaries": [
+    "spa_Latn",
+    "eng_Latn",
+    "fra_Latn",
+    "deu_Latn",
+    "ita_Latn",
+    "por_Latn"
+  ],
+  "primary": "spa_Latn",
+  "recipe_file": "cbt.mt.nllb-1.3b.yaml",
+  "recipe_id": "cbt.mt.nllb-1.3b",
+  "selection_chrf_greedy": 46.6,
+  "selection_examples": 480,
+  "steps": 6582,
+  "trained_at": "2026-11-03T21:26:59+00:00",
+  "weights": "weights"
+}

@@ -1,0 +1,116 @@
+{
+  "validation": {
+    "backend": "ServerTranslator",
+    "cbt>eng": {
+      "bleu": 24.31,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 19.71,
+          "chrf++": 42.37,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 24.82,
+          "chrf++": 45.5,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 11.48,
+          "chrf++": 34.14,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 28.0,
+          "chrf++": 48.84,
+          "n": 97
+        }
+      },
+      "chrf++": 45.51,
+      "n": 328
+    },
+    "cbt>spa": {
+      "bleu": 22.89,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 18.72,
+          "chrf++": 43.48,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 21.64,
+          "chrf++": 44.91,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 13.67,
+          "chrf++": 36.13,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 27.38,
+          "chrf++": 49.25,
+          "n": 97
+        }
+      },
+      "chrf++": 45.85,
+      "n": 328
+    },
+    "eng>cbt": {
+      "bleu": 5.01,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 4.67,
+          "chrf++": 36.2,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 3.07,
+          "chrf++": 37.3,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 0.97,
+          "chrf++": 27.58,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 6.98,
+          "chrf++": 41.29,
+          "n": 97
+        }
+      },
+      "chrf++": 38.14,
+      "n": 328
+    },
+    "limit": null,
+    "mean_chrf++": 42.42,
+    "scored_at": "2026-11-03T19:54:19+00:00",
+    "spa>cbt": {
+      "bleu": 6.16,
+      "by_domain": {
+        "comercio_intercambio": {
+          "bleu": 5.57,
+          "chrf++": 38.42,
+          "n": 102
+        },
+        "emociones_relaciones": {
+          "bleu": 3.97,
+          "chrf++": 38.41,
+          "n": 110
+        },
+        "puente_civico": {
+          "bleu": 1.62,
+          "chrf++": 32.72,
+          "n": 19
+        },
+        "viaje_desplazamiento": {
+          "bleu": 8.23,
+          "chrf++": 43.67,
+          "n": 97
+        }
+      },
+      "chrf++": 40.2,
+      "n": 328
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # Which model each task/language serves. Written by the Trainer and by `uyari register`, both with the promotion rule. Never edit history.
 mt:
   cbt_Latn:
-    fast: mt-cbt-spa-nllb1.3b@v0.1
+    fast: mt-cbt-nllb1.3b@v0.3
     history:
     - at: '2026-11-02T12:41:57+00:00'
       slot: fast
@@ -9,3 +9,28 @@ mt:
       to: mt-cbt-spa-nllb1.3b@v0.1
       reason: validation mean chrF++ 37.84 vs retrieval floor 22.70 on data-2026.11 (no incumbent); trained
         on RTX 3060, recipe cbt-spa.mt.nllb-1.3b-3060
+    - at: '2026-11-03T15:45:52+00:00'
+      slot: fast
+      from: mt-cbt-spa-nllb1.3b@v0.1
+      to: mt-cbt-nllb1.3b@v0.2
+      reason: validation mean chrF++ 44.8 vs floor 22.5 and mt-cbt-spa-nllb1.3b@v0.1 37.84 on cbt>spa,
+        spa>cbt on data-2026.11
+    - at: '2026-11-03T21:45:49+00:00'
+      slot: fast
+      from: mt-cbt-nllb1.3b@v0.2
+      to: mt-cbt-nllb1.3b@v0.3
+      reason: validation mean chrF++ 44.59 vs floor 22.83 and mt-cbt-nllb1.3b@v0.2 44.80 on cbt>eng, cbt>spa,
+        eng>cbt, spa>cbt on data-2026.11-six
+    - at: '2026-11-03T23:24:07+00:00'
+      slot: promoted
+      from: null
+      to: mt-cbt-glimmer30b-qlora@v0.2
+      reason: validation mean chrF++ 42.74 vs floor 22.83 on data-2026.11-six
+    - at: '2026-11-04T02:09:44+00:00'
+      slot: promoted
+      from: mt-cbt-glimmer30b-qlora@v0.2
+      to: mt-cbt-glimmer30b-qlora@v0.4
+      reason: validation mean chrF++ 43.46 vs floor 22.83 and mt-cbt-glimmer30b-qlora@v0.2 42.74 on cbt>deu,
+        cbt>eng, cbt>fra, cbt>ita, cbt>por, cbt>spa, deu>cbt, eng>cbt, fra>cbt, ita>cbt, por>cbt, spa>cbt
+        on data-2026.11-six
+    promoted: mt-cbt-glimmer30b-qlora@v0.4
