@@ -3,7 +3,7 @@
     mt:
       cbt_Latn:
         promoted: mt-cbt-spa-glimmer30b-qlora@v0.1   # the demo default
-        fast: mt-cbt-spa-nllb1.3b@v0.1               # the demo's fast mode / HF Space
+        fast: mt-cbt-spa-nllb1.3b@v0.1               # the demo's second choice
         history: [...]
 """
 

@@ -1,4 +1,4 @@
-# NLLB-200 1.3B, full fine-tune, both directions. Fast baseline (and the HF Space model).
+# NLLB-200 1.3B, full fine-tune, both directions. Fast baseline.
 # Fits the 4090 with fp32 master weights + bf16 autocast; under an hour.
 id: cbt-spa.mt.nllb-1.3b
 build: data-2026.11

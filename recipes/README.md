@@ -21,6 +21,6 @@ One YAML per training run (`schemas/recipe.json`); nothing is configurable from 
 | Recipe | Hardware | Purpose |
 |---|---|---|
 | `cbt-spa.mt.glimmer-qlora.yaml` | 4090 (Linux, Unsloth) | headline model |
-| `cbt-spa.mt.nllb-1.3b.yaml` | 4090 | fast baseline, HF Space, the Trainer loop |
+| `cbt-spa.mt.nllb-1.3b.yaml` | 4090 | fast baseline, the Trainer loop |
 | `cbt-spa.mt.nllb-1.3b-3060.yaml` | 3060 12 GB | same model in pure bf16 |
 | `cbt-spa.mt.smoke.yaml`, `cbt-spa.mt.smoke-qlora.yaml` | any GPU | end-to-end smoke tests |

@@ -43,6 +43,9 @@ ISO1 = {"spa_Latn": "es", "eng_Latn": "en", "fra_Latn": "fr", "por_Latn": "pt"}
 OFFICIALS = ("spa_Latn", "eng_Latn", "fra_Latn", "deu_Latn", "ita_Latn", "por_Latn")
 SLOTS = {"promoted": "Glimmer · open weights", "fast": "NLLB · fast"}
 REPO_URL = "https://github.com/malexandersalazar/uyari"
+LINKEDIN_URL = "https://www.linkedin.com/in/malexandersalazar/"
+HF_GLMmer30B_URL = "https://huggingface.co/malexandersalazar/uyari-mt-cbt-glimmer30b-qlora"
+HF_NLLB_URL = "https://huggingface.co/malexandersalazar/uyari-mt-cbt-nllb1.3b"
 MAX_CHARS = 1000
 MAX_VOICE_SECONDS = 60  # protects the visitor's own budget: 60 s costs about $0.003
 # Short and plain; general advice only (no doses, no legal deadlines). Shown for the selected language.
@@ -84,12 +87,110 @@ REPLAY_JS = """() => {
   const play = box && box.offsetParent !== null && box.querySelector('button[aria-label="Play"]');
   if (play) play.click();
 }"""
+# Meta "Astryx" tokens (light / dark), mapped onto Gradio's theme variables. Custom CSS loads after the
+# theme CSS so these mappings win; `:root:root` also out-specifies the theme's `:root`. Dark values ride on
+# Gradio's `.dark` class (on by default when the OS prefers dark), so the page tracks the system theme; the
+# mappings are repeated there because `var()` resolves against the element that declares them. Blue is used
+# only for actions, links and focus; everything else stays neutral gray.
 CSS = """
-.uy-head h1 {margin-bottom: 0} .uy-head p {margin-top: 4px; opacity: .8} .uy-head p.uy-lead {opacity: 1}
+:root:root {
+  --uy-bg: #F2F4F6; --uy-surface: #FFFFFF; --uy-text: #111112; --uy-text-2: #666A72;
+  --uy-text-disabled: #9FA4AB; --uy-accent: #0064E0; --uy-on-accent: #FFFFFF;
+  --uy-accent-muted: #0082FB33; --uy-border: #DFE2E5;
+  --uy-ease: cubic-bezier(.24, 1, .4, 1); --uy-t-fast: .175s;
+  --uy-shadow-low: 0 1px 1px rgba(0,0,0,.10), 0 2px 8px rgba(5,54,89,.10);
+  --uy-shadow-med: 0 1px 2px rgba(0,0,0,.10), 0 2px 12px rgba(5,54,89,.12);
+  --uy-ring-selected: inset 0 0 0 2px #0171E380;
+  --background-fill-primary: var(--uy-bg); --background-fill-secondary: var(--uy-bg);
+  --body-text-color: var(--uy-text); --body-text-color-subdued: var(--uy-text-2);
+  --block-background-fill: var(--uy-surface); --block-border-color: var(--uy-border);
+  --block-border-width: 1px; --block-radius: 12px; --block-shadow: none;
+  --container-radius: 12px; --panel-background-fill: var(--uy-bg);
+  --border-color-primary: var(--uy-border); --border-color-accent: var(--uy-accent);
+  --color-accent: var(--uy-accent); --color-accent-soft: var(--uy-accent-muted);
+  --link-text-color: var(--uy-accent); --link-text-color-active: var(--uy-accent);
+  --link-text-color-hover: var(--uy-accent); --link-text-color-visited: var(--uy-accent);
+  --block-label-text-color: var(--uy-text); --block-title-text-color: var(--uy-text);
+  --block-info-text-color: var(--uy-text-2);
+  --input-background-fill: var(--uy-surface); --input-border-color: var(--uy-border);
+  --input-border-width: 1px; --input-radius: 8px; --input-shadow: none;
+  --input-shadow-focus: var(--uy-ring-selected); --input-border-color-focus: var(--uy-accent);
+  --input-placeholder-color: var(--uy-text-disabled);
+  --shadow-drop: var(--uy-shadow-low); --shadow-drop-lg: var(--uy-shadow-med);
+  --button-primary-background-fill: var(--uy-accent); --button-primary-border-color: var(--uy-accent);
+  --button-primary-background-fill-hover: #005FD5; --button-primary-border-color-hover: #005FD5;
+  --button-primary-text-color: var(--uy-on-accent);
+  --button-secondary-background-fill: var(--uy-surface); --button-secondary-background-fill-hover: #F2F2F2;
+  --button-secondary-border-color: var(--uy-border); --button-secondary-border-color-hover: var(--uy-border);
+  --button-secondary-text-color: var(--uy-text);
+  --button-large-radius: 9999px; --button-medium-radius: 9999px; --button-small-radius: 9999px;
+  --button-small-text-weight: 600;
+  --button-transition: background-color var(--uy-t-fast) var(--uy-ease), border-color var(--uy-t-fast) var(--uy-ease), box-shadow var(--uy-t-fast) var(--uy-ease);
+}
+:root.dark, :root .dark {
+  --uy-bg: #111112; --uy-surface: #1F1F22; --uy-text: #F2F4F6; --uy-text-2: #9FA4AB;
+  --uy-text-disabled: #666A72; --uy-accent: #2694FE; --uy-on-accent: #FFFFFF; --uy-link: #3E9EFB;
+  --uy-accent-muted: #0082FB3F; --uy-border: #494D53;
+  --uy-shadow-low: 0 1px 1px rgba(0,0,0,.20), 0 2px 8px rgba(0,0,0,.20);
+  --uy-shadow-med: 0 1px 2px rgba(0,0,0,.20), 0 2px 12px rgba(0,0,0,.22);
+  --background-fill-primary: var(--uy-bg); --background-fill-secondary: var(--uy-bg);
+  --body-text-color: var(--uy-text); --body-text-color-subdued: var(--uy-text-2);
+  --block-background-fill: var(--uy-surface); --block-border-color: var(--uy-border);
+  --block-border-width: 1px; --block-radius: 12px; --block-shadow: none;
+  --container-radius: 12px; --panel-background-fill: var(--uy-bg);
+  --border-color-primary: var(--uy-border); --border-color-accent: var(--uy-accent);
+  --color-accent: var(--uy-accent); --color-accent-soft: var(--uy-accent-muted);
+  --link-text-color: var(--uy-link); --link-text-color-active: var(--uy-link);
+  --link-text-color-hover: var(--uy-link); --link-text-color-visited: var(--uy-link);
+  --block-label-text-color: var(--uy-text); --block-title-text-color: var(--uy-text);
+  --block-info-text-color: var(--uy-text-2);
+  --input-background-fill: var(--uy-surface); --input-border-color: var(--uy-border);
+  --input-border-width: 1px; --input-radius: 8px; --input-shadow: none;
+  --input-shadow-focus: var(--uy-ring-selected); --input-border-color-focus: var(--uy-accent);
+  --input-placeholder-color: var(--uy-text-disabled);
+  --shadow-drop: var(--uy-shadow-low); --shadow-drop-lg: var(--uy-shadow-med);
+  --button-primary-background-fill: var(--uy-accent); --button-primary-border-color: var(--uy-accent);
+  --button-primary-background-fill-hover: #3C9FFE; --button-primary-border-color-hover: #3C9FFE;
+  --button-primary-text-color: var(--uy-on-accent);
+  --button-secondary-background-fill: var(--uy-surface); --button-secondary-background-fill-hover: #353538;
+  --button-secondary-border-color: var(--uy-border); --button-secondary-border-color-hover: var(--uy-border);
+  --button-secondary-text-color: var(--uy-text);
+  --button-large-radius: 9999px; --button-medium-radius: 9999px; --button-small-radius: 9999px;
+  --button-small-text-weight: 600;
+  --button-transition: background-color var(--uy-t-fast) var(--uy-ease), border-color var(--uy-t-fast) var(--uy-ease), box-shadow var(--uy-t-fast) var(--uy-ease);
+}
+a {color: var(--uy-accent); text-decoration: none}
+a:hover {text-decoration: underline}
+table td, table th {border-color: var(--uy-border)}
+:focus-visible {outline: 2px solid var(--uy-accent); outline-offset: 3px}
+.uy-head h1 {margin-bottom: 0; font-size: 1.25rem; font-weight: 600; line-height: 1.25}
+.uy-head p {margin-top: 4px; opacity: .8} .uy-head p.uy-lead {opacity: 1}
 .uy-big textarea {font-size: 1.15rem; line-height: 1.55}
 .uy-arrow {font-size: 1.8rem !important; line-height: 1; text-align: center; align-self: center; opacity: .6}
 .uy-foot, .uy-small {font-size: .85rem; opacity: .8}
+.uy-foot {overflow-wrap: anywhere; line-height: 1.5}
+.uy-pairs table {font-size: .8rem}
+.uy-pairs th {color: var(--uy-text-2); font-weight: 600}
+.uy-pairs td, .uy-pairs th {border-left: none; border-right: none; padding: 6px 10px}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {transition-duration: .01ms !important; animation-duration: .01ms !important}
+}
 """
+
+
+def _theme():
+    """The Gradio theme: a Meta-blue ramp (Soft's default is indigo) and the spec's font stacks. Exact
+    surfaces come from CSS; the ramp keeps everything CSS does not pin (sliders, checkboxes) in the same
+    blue. Gradio is imported here so `import app` stays light where Gradio is not installed (CI)."""
+    import gradio as gr
+
+    blue = gr.themes.Color(c50="#EAF3FF", c100="#D6E8FF", c200="#B0D0FF", c300="#7DB1FB", c400="#3E9EFB",
+                           c500="#1287FA", c600="#0064E0", c700="#0051B5", c800="#06438F", c900="#0A3771",
+                           c950="#072747", name="uyari-blue")
+    font = ("Optimistic AI VF", "Optimistic", "system-ui", "-apple-system", "Segoe UI", "Helvetica", "Arial",
+            "sans-serif")
+    font_mono = ("SF Mono", "Monaco", "Consolas", "monospace")
+    return gr.themes.Soft(primary_hue=blue, secondary_hue=blue, font=font, font_mono=font_mono)
 
 
 def _models(paths) -> dict[str, dict]:
@@ -562,7 +663,7 @@ def launch(paths, share: bool = True, voice: bool = True, port: int = 7860):
                     a_audio = player("Shawi audio", "uy-a-player")
                 a_said = gr.State("")
                 a_mode, a_btn = model_row()
-                a_info, a_pairs = gr.Markdown(), gr.Markdown()
+                a_info, a_pairs = gr.Markdown(), gr.Markdown(elem_classes="uy-pairs")
                 # Examples in the selected language only (a Dataset, so its samples follow "From").
                 a_ex = gr.Dataset(components=[a_src], samples=_examples_for(into[0]), label="Try an example")
             # 2. Shawi -> official, text only.
@@ -571,7 +672,7 @@ def launch(paths, share: bool = True, voice: bool = True, port: int = 7860):
                     b_src_lang, b_lang = pickers(shawi, out_of[0], [shawi], out_of)
                     b_src, b_out, _ = text_panel("Type or paste Shawi. It translates as you type.")
                     b_mode, b_btn = model_row()
-                    b_info, b_pairs = gr.Markdown(), gr.Markdown()
+                    b_info, b_pairs = gr.Markdown(), gr.Markdown(elem_classes="uy-pairs")
                     examples = _examples_from(paths, models)
                     if examples:
                         gr.Examples(examples, inputs=[b_src], label="Try a Shawi sentence from our data")
@@ -607,11 +708,15 @@ def launch(paths, share: bool = True, voice: bool = True, port: int = 7860):
         with gr.Accordion("What works today and what's next", open=False):
             gr.Markdown(status_md(paths, models, coverage))
         gr.Markdown(
-            f"<div class='uy-foot'>Open source: models, data and code at <a href='{REPO_URL}'>{REPO_URL}</a>. "
+            f"<div class='uy-foot'>Open source: data and code on <a href='{REPO_URL}'>GitHub</a>; models "
+            f"(<a href='{HF_GLMmer30B_URL}'>Glimmer 30B QLoRA</a> · <a href='{HF_NLLB_URL}'>NLLB 1.3B</a>) on "
+            "Hugging Face. "
             "Data CC BY 4.0 · NLLB weights CC BY-NC 4.0 (non-commercial) · Muse Glimmer Apache 2.0 · MMS voice "
             "CC BY-NC 4.0.<br>Machine translation can be wrong: have a Shawi speaker check anything used for health "
             "care or legal matters. Shawi output can be heard; Shawi speech input comes later."
-            + ("" if english_ready else " English ↔ Shawi is being trained next.") + "</div>")
+            + ("" if english_ready else " English ↔ Shawi is being trained next.")
+            + f"<br>Designed by Muse Spark 1.3 Contributor · Built by "
+            f"<a href='{LINKEDIN_URL}'>@malexandersalazar</a>.</div>")
 
         live = {"trigger_mode": "always_last", "show_progress": "hidden", "concurrency_id": "mt"}
         tabs = [(a_src, a_lang, a_tgt, a_out, a_info, a_pairs, a_btn, a_mode)]
@@ -646,4 +751,4 @@ def launch(paths, share: bool = True, voice: bool = True, port: int = 7860):
                 rec.success(lambda t: speak(t)[0], v_out, v_audio, concurrency_id="tts")
     demo.queue(default_concurrency_limit=1).launch(
         share=share, server_name=os.environ.get("UYARI_DEMO_HOST", "0.0.0.0"), server_port=port,
-        theme=gr.themes.Soft(), css=CSS)
+        theme=_theme(), css=CSS)

@@ -20,3 +20,4 @@ How to contribute, and the rules on rights, consent and withdrawal, in the same 
 
 * [`decisions/`](decisions/): one short record per structural decision.
 * [`RUNBOOK-4090.md`](RUNBOOK-4090.md): training and the demo on the Ubuntu RTX 4090.
+* [`PUBLISHING.md`](PUBLISHING.md): models to Hugging Face (`uyari publish`, the token).

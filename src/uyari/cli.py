@@ -292,7 +292,7 @@ def trainer(language: str = typer.Option("cbt_Latn"),
 
 @app.command()
 def register(model: str = typer.Option(..., help="models/<name>@vX.Y"),
-             slot: str = typer.Option(None, help="promoted (the demo default) or fast (fast mode, HF Space). "
+             slot: str = typer.Option(None, help="promoted (the demo default) or fast (the demo's second choice). "
                                                "Default: promoted for Glimmer (QLoRA), fast for NLLB."),
              test: bool = typer.Option(True, "--test/--no-test", help="Score test once when registered."),
              force: bool = typer.Option(False, help="Register even if the rule says no. Needs --reason."),

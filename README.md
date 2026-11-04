@@ -52,7 +52,7 @@ added as a folder.
 | **Muse Glimmer 30B** (open weights, Apache 2.0) | The headline translator (QLoRA, Shawi ↔ six official languages, the demo default); the Gatekeeper agent's reviewer; free local Spanish generation | Trained on a rented Modal H100 ([`scripts/modal_glimmer.py`](scripts/modal_glimmer.py): the 4-bit model does not fit 24 GB for training); served on our RTX 4090 as Unsloth's 4-bit GGUF with the adapter, through llama-server (`uyari serve`, 16.5 GB) |
 | **Muse Spark 1.3 Contributor** | Spanish source-sentence generation (about $0.02 per 1,000 sentences) and their translation into the other official languages (about $0.02 per 1,000 sentences per language); in the demo, a spoken language into Spanish only if no model takes it into Shawi (visitor's key). It never sees Shawi: the Contributor tier lets Meta train on prompts | Meta Model API |
 | **Muse Voice Transcribe** | Spanish, English, French and Portuguese voice input in the demo, paid with the visitor's own key (the server never uses its own) | Meta Model API |
-| NLLB-200 1.3B (CC BY-NC) | Fast baseline, the demo's second choice, the public Hugging Face Space | RTX 3060 / 4090 / CPU |
+| NLLB-200 1.3B (CC BY-NC) | Fast baseline, the demo's second choice | RTX 3060 / 4090 / CPU |
 | MMS-TTS (`facebook/mms-tts-cbt`, CC BY-NC) | Reads Shawi aloud in the demo and `uyari s2s`, through our spelling converter; replaced by a voice of our own once there are recordings | Our server, CPU |
 | Omnilingual ASR | Indigenous speech input once recordings exist (zero-shot, unmeasured until then) | RTX 4090 |
 
@@ -134,7 +134,7 @@ builds/<tag>/            MANIFEST.json (parquet is not in git; rebuilt from the 
 models/                  registry.yaml, model cards and scores (weights are not in git)
 reports/                 generation comparison, side-by-side translations
 src/uyari/               the code (one CLI: `uyari`)
-demo/  space/            Gradio demo (4090) and the public CPU Space
+demo/                    Gradio demo (4090)
 contributing/            how to contribute, rights and consent templates, takedowns.csv, in 8 languages
 docs/                    PROBLEM and METHODOLOGY in 7 more languages, decisions, runbook
 ```
