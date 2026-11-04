@@ -2,6 +2,11 @@
 
 One folder per contribution, `<YYYY-MM>_<org>_<nnnn>`, immutable once merged. See [`contributing/`](../../../contributing/).
 
+**Made before the hackathon:** `2026-11_uyari_0001`, `0002` and `0003` hold 3,578 human Shawi translations made
+from July to October 2026 and filed in November. They are commissioned work whose rights are held by the
+co-leads of the Shawi–Spanish case, released under CC BY 4.0
+([`README.md`](../../../README.md#hackathon-submission-what-existed-before-what-was-built)).
+
 | File | Columns / fields | Required when | Read by |
 |---|---|---|---|
 | `contribution.yaml` | `id, language, variety, contributor_id, organization, collection_dates, provenance{text,audio}, license, consent{template,authority}, compensated` | always | validate; build (license and provenance on every row) |

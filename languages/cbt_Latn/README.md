@@ -22,4 +22,9 @@ Shawi; any language is added the same way.
 All three: CC BY 4.0 ([`DATA_LICENSE.md`](../../DATA_LICENSE.md)), collected 2026-06-01 to 2026-11-01. Translation
 continues; new work arrives as new contributions.
 
+**Made before the hackathon.** These three contributions are an input the hackathon submission did not build:
+human translations, made from July to October 2026, of sentences from the June 2026 Spanish batch. They were
+commissioned and paid for by the case co-leads, who hold the rights. The builds, models and voice that use them
+were made during the hackathon ([`README.md`](../../README.md#hackathon-submission-what-existed-before-what-was-built)).
+
 How to contribute, and the rules on rights and consent (8 languages): [`contributing/`](../../contributing/).

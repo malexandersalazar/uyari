@@ -2,6 +2,24 @@
 
 *Uyari* means "listen" in Quechua.
 
+## Hackathon submission: what existed before, what was built
+
+Everything in this repository was built during the hackathon except two inputs we made before it and own.
+They are disclosed here and kept in their own, labelled folders.
+
+| | What | When | Where |
+|---|---|---|---|
+| **Input, made before the hackathon** | 10,000 Spanish source sentences, generated with Claude Opus 4.8 from the design matrix | June 2026 | [`primary/spa_Latn/chunks/generated/2026-06_opus48_0001.csv`](primary/spa_Latn/chunks/generated/2026-06_opus48_0001.csv) |
+| **Input, made before the hackathon** | 3,578 human Shawi translations of 3,575 of those sentences, commissioned and paid for by Alexander Salazar and Yuri Cavero, the co-leads of the Shawi–Spanish case, who hold the rights and release them under CC BY 4.0 | July to October 2026 | [`languages/cbt_Latn/contributions/`](languages/cbt_Latn/contributions/) (`2026-11_uyari_0001` to `0003`), [decision 0004](docs/decisions/0004-commissioned-shawi-contributions.md), [`DATA_LICENSE.md`](DATA_LICENSE.md) |
+| **Built during the hackathon** | Everything else: the toolkit ([`src/uyari/`](src/uyari/)) with its data format, validator and builds; generation on Meta models and the 101,363 Muse Spark sentences; the translation of all 111,363 sentences into seven more languages; both fine-tuned models; the Shawi voice; the demo | 2 to 4 November 2026 (UTC): git history, the `gen_date` of every batch, each model's `trained_at` | the rest of the repository |
+
+**Fine-tuned weights, published, and where they run:**
+
+| Model | Weights | License | Where it runs |
+|---|---|---|---|
+| Muse Glimmer 30B QLoRA, `mt-cbt-glimmer30b-qlora@v0.4` (the demo default) | [huggingface.co/malexandersalazar/uyari-mt-cbt-glimmer30b-qlora](https://huggingface.co/malexandersalazar/uyari-mt-cbt-glimmer30b-qlora) (LoRA adapter and GGUF) | Apache 2.0 | Trained on a rented Modal H100; served on our RTX 4090 as Unsloth's 4-bit GGUF with the adapter, through llama-server |
+| NLLB-200 1.3B, `mt-cbt-nllb1.3b@v0.3` | [huggingface.co/malexandersalazar/uyari-mt-cbt-nllb1.3b](https://huggingface.co/malexandersalazar/uyari-mt-cbt-nllb1.3b) | CC BY-NC 4.0 | Trained on our RTX 4090; runs on the 4090, an RTX 3060 or a CPU |
+
 **The problem in brief.** About **476.6 million** Indigenous people — over 6% of humanity — live in
 90 countries. They are nearly three times more likely to live in extreme poverty; 3,193 of 7,159 living
 languages (about 45%) are endangered; 40% of people worldwide lack education in a language they understand,
@@ -43,7 +61,7 @@ added as a folder.
 | Shawi ↔ **English, French, German, Italian, Portuguese**, text | Every Spanish sentence has a twin with the same id in each language (machine-translated with Muse Spark), so all 3,575 human Shawi translations pair with all six. Test chrF++ into / out of Shawi, NLLB: English 43.3 / 45.5, French 43.1 / 46.3, German 42.6 / 44.1, Italian 43.2 / 44.7, Portuguese 43.3 / 43.0 (Glimmer: English 40.9 / 44.9, French 39.9 / 44.9, German 40.9 / 43.4, Italian 41.1 / 43.8, Portuguese 41.3 / 41.9). The official-language references are machine-translated; the Shawi is human ([details](primary/eng_Latn/README.md)). |
 | Spanish, English, French or Portuguese **speech** in → Shawi text **and speech** out | Demo, one action: Muse Voice Transcribe (the visitor's own Meta key) → our translator → Shawi read aloud by Meta's MMS voice on our own server. That voice learned an older spelling from Bible readings, so a spelling converter ([`tts.yaml`](languages/cbt_Latn/tts.yaml)) rewrites our text for it: it can read 99.99% of the letters in our Shawi text, 86% without. Also `uyari s2s`. |
 | Shawi **speech** in, and a Shawi voice of our own | **Not yet: there are no Shawi recordings.** The format, validator, build and ASR/TTS pipelines run on a labelled synthetic fixture; [`languages/cbt_Latn/NEEDS.md`](languages/cbt_Latn/NEEDS.md) asks for recordings. |
-| Spanish source sentences | 11,977 chunks from a fixed design matrix. Generation now runs on Meta: same prompt, **3.3% of the cost** with Muse Spark, **no API cost** with Muse Glimmer ([details](primary/spa_Latn/README.md)). |
+| Spanish source sentences | 111,363 chunks from a fixed design matrix: the 10,000 of June 2026, and 101,363 generated with Muse Spark 1.3 Contributor during the hackathon. Same prompt, **3.3% of the cost** with Muse Spark, **no API cost** with Muse Glimmer ([details](primary/spa_Latn/README.md)). |
 
 ## Meta models, and what each one does
 
@@ -113,7 +131,8 @@ Every command takes `--root` to run on another data root (the tests use a synthe
   your own `META_API_KEY`, and every paid command has `--estimate`.
 * **Budget:** USD 150 for the project's own API use. Every call is in `.uyari/ledger.jsonl`; each run has a cap
   (`generate` $1, `transcribe` $2, everything else $0 because it is local). `uyari llm spend`.
-  Spent so far: $15.51 (generation $2.12, translation into seven languages $13.39). Rented GPUs (Modal, for
+  Spent so far: $15.74 (generation $2.16, translation into seven languages $13.58: the ledger cost noted on
+  every batch in `primary/*/primary.yaml`). Rented GPUs (Modal, for
   Glimmer's training, six runs): about US$ 30 so far.
 * **Data policy:** every model in [`config/llm.yaml`](config/llm.yaml) declares what it may see.
   Anything containing Shawi goes only to models on our own hardware, or to a GPU we rent to run our own
