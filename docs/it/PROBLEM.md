@@ -114,7 +114,7 @@ Che cosa manca, ed è ciò per cui è fatto Uyari:
 
 Lo shawi è il primo perché lì il lavoro era già cominciato, non perché il problema sia peruviano. Il caso
 shawi–spagnolo è nato dalla salute materna: le comunità shawi si rivolgono a servizi sanitari che non offrono
-alcun supporto nella loro lingua. Chi guida il caso ha fatto realizzare traduzioni umane, e quelle traduzioni
+alcun supporto nella loro lingua. Per questo caso sono state commissionate traduzioni umane, e quelle traduzioni
 sono i primi dati di Uyari. Niente nel codice è specifico dello shawi.
 
 | Indicatore | Dato | Fonte |

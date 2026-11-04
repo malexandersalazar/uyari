@@ -13,5 +13,5 @@ apostrophe_variants: ["'", "’", "‘", "´", "`", "ʻ", "ʹ", "′"]
 training_orthography: _unspecified   # the translators' spelling; to be named by the steward
 trainer:
   # Recipes the Trainer runs on every qualifying merge (the filmed loop). Glimmer runs manually.
-  recipes: [recipes/cbt.mt.nllb-1.3b.yaml]   # Shawi <-> Spanish and English, one model
+  recipes: [recipes/cbt.mt.nllb-1.3b.yaml]   # Shawi <-> six official languages (12 directions), one model
   min_growth: 0.10       # cut a new build only for >=10% more rows (or a new language)

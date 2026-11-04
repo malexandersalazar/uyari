@@ -11,4 +11,4 @@ travail commandé ne sont pas identifiées dans le dépôt ; les identifiants de
   personne ([`consent-individual.md`](consent-individual.md)), quel que soit celui qui les a payés.
 
 Les premières contributions en shawi (`2026-11_uyari_0001` à `0003`) sont un travail commandé ; leurs droits sont
-détenus par Alexander Salazar et Yuri Cavero, qui portent le cas shawi–espagnol.
+détenus par Alexander Salazar et Yuri Cavero.

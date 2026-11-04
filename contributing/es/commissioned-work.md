@@ -11,4 +11,4 @@ por encargo no se identifican en el repositorio; los ids de las filas son seudó
   persona ([`consent-individual.md`](consent-individual.md)), sin importar quién las pagó.
 
 Los primeros aportes en shawi (`2026-11_uyari_0001` a `0003`) son trabajo por encargo; sus derechos pertenecen
-a Alexander Salazar y Yuri Cavero, quienes lideran el caso shawi–español.
+a Alexander Salazar y Yuri Cavero.

@@ -106,7 +106,7 @@ Missing, and what Uyari is built for:
 
 Shawi is first because the work had already started there, not because the problem is Peruvian. The
 Shawi–Spanish case began with maternal health: Shawi communities meet health services that offer no support
-in their language. Its leads had human translations made, and those translations are Uyari's first data.
+in their language. Human translations were commissioned for it, and those translations are Uyari's first data.
 Nothing in the code is specific to Shawi.
 
 | Indicator | Figure | Source |

@@ -11,4 +11,4 @@
   ([`consent-individual.md`](consent-individual.md)) ไม่ว่าใครจะเป็นผู้จ่ายเงิน
 
 การมีส่วนร่วมภาษาชาวีชุดแรก (`2026-11_uyari_0001` ถึง `0003`) เป็นงานที่ว่าจ้าง สิทธิเป็นของ
-Alexander Salazar และ Yuri Cavero ซึ่งเป็นผู้นำกรณีชาวี–สเปน
+Alexander Salazar และ Yuri Cavero

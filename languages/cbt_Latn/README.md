@@ -4,8 +4,8 @@ Shawi (Chayahuita), Cahuapanan family, Loreto, Peru. Glottocode `chay1248`. Abou
 speakers (2017 census).
 
 **Why Shawi is the first language.** The Shawi–Spanish case began with maternal health: Shawi communities meet
-health services that offer no support in their language. It is co-led by Alexander Salazar and Yuri Cavero
-([`CREDITS.md`](../../CREDITS.md)), who had the translations below made. Nothing in Uyari's code is specific to
+health services that offer no support in their language. The translations below were commissioned for it
+(rights and license: [`DATA_LICENSE.md`](../../DATA_LICENSE.md)). Nothing in Uyari's code is specific to
 Shawi; any language is added the same way.
 
 * Translations are made from `primary/spa_Latn/chunks/`; each row of `pairs.csv` carries the chunk's `chunk_id`.
@@ -24,7 +24,7 @@ continues; new work arrives as new contributions.
 
 **Made before the hackathon.** These three contributions are an input the hackathon submission did not build:
 human translations, made from July to October 2026, of sentences from the June 2026 Spanish batch. They were
-commissioned and paid for by the case co-leads, who hold the rights. The builds, models and voice that use them
-were made during the hackathon ([`README.md`](../../README.md#hackathon-submission-what-existed-before-what-was-built)).
+commissioned work, released under CC BY 4.0 by its rights holders ([`DATA_LICENSE.md`](../../DATA_LICENSE.md)).
+The builds, the models and the spelling converter for Meta's MMS voice that use them were made during the hackathon ([`README.md`](../../README.md#hackathon-submission-what-existed-before-what-was-built)).
 
 How to contribute, and the rules on rights and consent (8 languages): [`contributing/`](../../contributing/).

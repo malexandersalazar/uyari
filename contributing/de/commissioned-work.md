@@ -11,4 +11,4 @@ haben, werden im Repository nicht identifiziert; Zeilen-IDs sind pseudonym.
   ([`consent-individual.md`](consent-individual.md)), egal wer dafür bezahlt hat.
 
 Die ersten Shawi-Beiträge (`2026-11_uyari_0001` bis `0003`) sind Auftragsarbeiten; ihre Rechte halten Alexander
-Salazar und Yuri Cavero, die den Fall Shawi–Spanisch leiten.
+Salazar und Yuri Cavero.

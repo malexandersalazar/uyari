@@ -11,4 +11,4 @@ commissione non sono identificate nel repository; gli id delle righe sono pseudo
   ([`consent-individual.md`](consent-individual.md)), chiunque le abbia pagate.
 
 I primi contributi shawi (da `2026-11_uyari_0001` a `0003`) sono lavoro su commissione; i loro diritti sono
-detenuti da Alexander Salazar e Yuri Cavero, che guidano il caso shawi–spagnolo.
+detenuti da Alexander Salazar e Yuri Cavero.

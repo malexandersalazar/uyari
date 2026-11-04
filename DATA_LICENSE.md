@@ -46,7 +46,7 @@ tend to reject, so Uyari keeps standard licenses and asks.
 ## The data today
 
 * **Shawi–Spanish translations** (`2026-11_uyari_0001` to `0003`): **CC BY 4.0**. Commissioned work; the rights
-  are held by Alexander Salazar and Yuri Cavero, who lead the Shawi–Spanish case. Translated from July to
+  are held by Alexander Salazar and Yuri Cavero. Translated from July to
   October 2026, before the hackathon, within the collection window each contribution records (2026-06-01 to
   2026-11-01). Translation continues; later work is added as new contributions.
 * **Spanish primary sentences** (`primary/`): synthetic text generated for this project. **CC BY 4.0.** The

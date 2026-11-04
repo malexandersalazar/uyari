@@ -11,4 +11,4 @@ commissioned work are not identified in the repository; row ids are pseudonymous
   ([`consent-individual.md`](consent-individual.md)), whoever paid for them.
 
 The first Shawi contributions (`2026-11_uyari_0001` to `0003`) are commissioned work; their rights are held by
-Alexander Salazar and Yuri Cavero, who lead the Shawi–Spanish case.
+Alexander Salazar and Yuri Cavero.

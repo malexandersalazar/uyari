@@ -116,7 +116,7 @@ Was fehlt und wofür Uyari gebaut ist:
 
 Shawi ist der erste Fall, weil die Arbeit dort bereits begonnen hatte, nicht weil das Problem peruanisch ist. Der
 Fall Shawi–Spanisch begann mit Müttergesundheit: Shawi-Gemeinschaften treffen auf Gesundheitsdienste, die keine
-Unterstützung in ihrer Sprache bieten. Die Leitung des Falls ließ Übersetzungen von Menschen anfertigen, und diese
+Unterstützung in ihrer Sprache bieten. Für diesen Fall wurden Übersetzungen von Menschen in Auftrag gegeben, und diese
 Übersetzungen sind Uyaris erste Daten. Nichts im Code ist spezifisch für Shawi.
 
 | Indikator | Zahl | Quelle |

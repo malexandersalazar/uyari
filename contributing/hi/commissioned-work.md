@@ -11,4 +11,4 @@
   ([`consent-individual.md`](consent-individual.md)), चाहे भुगतान किसी ने भी किया हो।
 
 शावी के पहले योगदान (`2026-11_uyari_0001` से `0003` तक) अनुबंधित काम हैं; उनके अधिकार
-Alexander Salazar और Yuri Cavero के पास हैं, जो शावी–स्पेनिश मामले का नेतृत्व करते हैं।
+Alexander Salazar और Yuri Cavero के पास हैं।

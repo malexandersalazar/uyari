@@ -11,4 +11,4 @@ encomendado não são identificadas no repositório; os ids das linhas são pseu
   ([`consent-individual.md`](consent-individual.md)), independentemente de quem tenha pago por elas.
 
 As primeiras contribuições em shawi (`2026-11_uyari_0001` a `0003`) são trabalho encomendado; os seus
-direitos pertencem a Alexander Salazar e Yuri Cavero, que lideram o caso shawi–espanhol.
+direitos pertencem a Alexander Salazar e Yuri Cavero.
